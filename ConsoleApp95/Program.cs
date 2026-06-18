@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -541,7 +542,33 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\nYou got {score}/{questions.Count} correct!");
                     Console.WriteLine("Total Points: " + points);
-                    Console.ResetColor();
+                    string file = "Leaderboard.txt";
+                    string[] lines = File.Exists(file) ? File.ReadAllLines(file) : new string[0]; // this is basically just a shortened version of if else 
+                    bool userfound = false;
+                    for(int i = 0; i < lines.Length;i++)
+                    {
+                        string[] parts = lines[i].Split(',');
+
+                        if (currentUser == parts[0])
+                        {
+                            int existingpoints = int .Parse(parts[1]);
+                            if (points > existingpoints)
+                            {
+                                lines[i] = currentUser + "," + points;
+                            }
+                            userfound = true;
+                            break;
+                        }
+                      
+                    }
+                    if (!userfound)
+                    {
+                        File.AppendAllText(file, currentUser + "," + points + "\n");
+                    }
+                    if (userfound)
+                    {
+                        File.WriteAllLines(file, lines);
+                    }
                     gamemenu(wordDictionary);
                     break;
                 }
