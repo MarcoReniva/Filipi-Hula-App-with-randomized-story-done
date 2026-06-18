@@ -279,12 +279,12 @@ namespace ConsoleApp2
                     case "2":
                         exitchoice = true;
                         Console.Clear();
-                        HangmanNormal();
+                        HangmanNormal(currentUser, points, wordDictionary);
                         break;
                     case "3":
                         exitchoice = true;
                         Console.Clear();
-                        HangmanHard();
+                        HangmanHard(currentUser, points, wordDictionary);
                         break;
                     case "0":
                         exitchoice = true;
@@ -300,40 +300,314 @@ namespace ConsoleApp2
         static void HangmanEasy(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            List<char> CorrectLetters = new List<char>();
+            List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
-            Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
-            Console.WriteLine("\n=====================================");
-            Console.WriteLine("        HANGMAN EASY MODE       ");
-            Console.WriteLine("=====================================");
-            Console.WriteLine("> Are you ready to play?");
-            DrawHangman(wrongGuesses);
-
-            // word here with defintion
-            foreach (char w in hangmanword)
-            {
-                Console.Write(w);
-            }
-
-
-
-            Console.WriteLine("\nEnter a letter in the space below.");
-            string letter = Console.ReadLine();
-
-            //if letter not in word, add to wrong guesses and display in list
-            /*if (actualword.Contains(letter))
-            {
+            bool playing = true;
         
-            }*/
-
-
+            while (playing)
+            {
+                Console.Clear();
+                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
+                Console.WriteLine("\n=====================================");
+                Console.WriteLine("        HANGMAN EASY MODE       ");
+                Console.WriteLine("=====================================");
+                Console.WriteLine("> Are you ready to play?");
+                DrawHangman(wrongGuesses);
+                foreach (char c in hangmanword)
+                {
+                    if (CorrectLetters.Contains(c))
+                    {
+                        Console.Write(c);
+                    }
+                    else
+                    {
+                        Console.Write("_");
+                    }
+                }
+        
+                Console.WriteLine("\nMeaning: " + hangmandefinition);
+        
+                if (WrongLetters != null)
+                {
+                    Console.Write("Wrong guesses: ");
+                    foreach (char w in WrongLetters)
+                    {
+                        Console.Write(w);
+                    }
+                }
+        
+                Console.Write("\nGuess a letter: ");
+                string input = Console.ReadLine().ToLower();
+        
+                if (input.Length != 1) //it needs to be char
+                {
+                    continue;
+                }
+        
+                char letter = input[0];
+        
+                if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
+                {
+                    continue;
+                }
+        
+                if (hangmanword.Contains(letter))
+                {
+                    CorrectLetters.Add(letter);
+                }
+                else
+                {
+                    WrongLetters.Add(letter);
+                    wrongGuesses++;
+                }
+               
+        
+                // Check win
+                bool won = true;
+                foreach (char c in hangmanword)
+                {
+                    if (!CorrectLetters.Contains(c))
+                    {
+                        won = false;
+                        break;
+                    }
+                }
+        
+                if (won)
+                {
+                    Console.WriteLine("\nYou Win!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+        
+                if (wrongGuesses >= 6)
+                {
+                    Console.WriteLine("\nYou Lose!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+            }
         }
-        static void HangmanNormal()
+        
+        
+        static void HangmanNormal(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
-            Console.WriteLine("NORMAL MODE");
+            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            List<char> CorrectLetters = new List<char>();
+            List<char> WrongLetters = new List<char>();
+            int wrongGuesses = 0;
+            bool playing = true;
+        
+            while (playing)
+            {
+                Console.Clear();
+                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
+                Console.WriteLine("\n=====================================");
+                Console.WriteLine("        HANGMAN NORMAL MODE       ");
+                Console.WriteLine("=====================================");
+                Console.WriteLine("> Are you ready to play?");
+                DrawHangman(wrongGuesses);
+                foreach (char c in hangmanword)
+                {
+                    if (CorrectLetters.Contains(c))
+                    {
+                        Console.Write(c);
+                    }
+                    else
+                    {
+                        Console.Write("_");
+                    }
+                }
+        
+                Console.WriteLine("\nDo you want to unlock the definition? Doing this action will result to building your stickman by 1. Y/N");
+                string unlock = Console.ReadLine(); //STILL NEED TO FIX SO THE LOOP WONT REMOVE THIS
+                
+                if (unlock == "Y")
+                {
+                    Console.WriteLine("\nMeaning: " + hangmandefinition);
+                    wrongGuesses++;
+                }
+                else if (unlock == "N")
+                {
+                    continue;
+                }
+                else 
+                { 
+                    continue; 
+                }
+        
+                
+        
+                if (WrongLetters != null)
+                {
+                    Console.Write("Wrong guesses: ");
+                    foreach (char w in WrongLetters)
+                    {
+                        Console.Write(w);
+                    }
+                }
+        
+                Console.Write("\nGuess a letter: ");
+                string input = Console.ReadLine().ToLower();
+        
+                if (input.Length != 1) //it needs to be char
+                {
+                    continue;
+                }
+        
+                char letter = input[0];
+        
+                if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
+                {
+                    continue;
+                }
+        
+                if (hangmanword.Contains(letter))
+                {
+                    CorrectLetters.Add(letter);
+                }
+                else
+                {
+                    WrongLetters.Add(letter);
+                    wrongGuesses++;
+                }
+        
+        
+                // Check win
+                bool won = true;
+                foreach (char c in hangmanword)
+                {
+                    if (!CorrectLetters.Contains(c))
+                    {
+                        won = false;
+                        break;
+                    }
+                }
+        
+                if (won)
+                {
+                    Console.WriteLine("\nYou Win!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+        
+                if (wrongGuesses >= 6)
+                {
+                    Console.WriteLine("\nYou Lose!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+            }
         }
-        static void HangmanHard()
+        static void HangmanHard(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+            
         {
-            Console.WriteLine("HARD MODE");
+            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            List<char> CorrectLetters = new List<char>();
+            List<char> WrongLetters = new List<char>();
+            int wrongGuesses = 0;
+            bool playing = true;
+        
+            while (playing)
+            {
+                Console.Clear();
+                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
+                Console.WriteLine("\n=====================================");
+                Console.WriteLine("        HANGMAN HARD MODE       ");
+                Console.WriteLine("=====================================");
+                Console.WriteLine("> Are you ready to play?");
+                DrawHangman(wrongGuesses);
+                foreach (char c in hangmanword)
+                {
+                    if (CorrectLetters.Contains(c))
+                    {
+                        Console.Write(c);
+                    }
+                    else
+                    {
+                        Console.Write("_");
+                    }
+                }
+        
+                if (WrongLetters != null)
+                {
+                    Console.Write("Wrong guesses: ");
+                    foreach (char w in WrongLetters)
+                    {
+                        Console.Write(w);
+                    }
+                }
+                Console.WriteLine();
+                Console.Write("\nGuess a letter: ");
+                string input = Console.ReadLine().ToLower();
+        
+                if (input.Length != 1) //it needs to be char
+                {
+                    continue;
+                }
+        
+                char letter = input[0];
+        
+                if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
+                {
+                    continue;
+                }
+        
+                if (hangmanword.Contains(letter))
+                {
+                    CorrectLetters.Add(letter);
+                }
+                else
+                {
+                    WrongLetters.Add(letter);
+                    wrongGuesses++;
+                }
+        
+        
+                // Check win
+                bool won = true;
+                foreach (char c in hangmanword)
+                {
+                    if (!CorrectLetters.Contains(c))
+                    {
+                        won = false;
+                        break;
+                    }
+                }
+        
+                if (won)
+                {
+                    Console.WriteLine("\nYou Win!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+        
+                if (wrongGuesses >= 6)
+                {
+                    Console.WriteLine("\nYou Lose!");
+                    Console.WriteLine("The word was: " + hangmanword);
+                    playing = false;
+                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    Console.ReadKey();
+                    return;
+                }
+            }
         }
         static void Readingcomp()
         {
