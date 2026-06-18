@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -86,7 +87,6 @@ namespace ConsoleApp2
                 Console.WriteLine("No accounts found. Please register first.");
                 return; 
             }
-
             foreach (string line in lines)
             {
                 string[] parts = line.Split(',');
@@ -99,11 +99,9 @@ namespace ConsoleApp2
                     return;
                 }
             }
-
             Console.WriteLine("Invalid username or password. Try again.");
             return; 
         }
-
         static void regist()
         {
             bool regis = false;
@@ -158,7 +156,6 @@ namespace ConsoleApp2
                 }
             }
         }
-
         static void gamemenu()
         {
             bool try3 = false;
@@ -206,7 +203,6 @@ namespace ConsoleApp2
         }
         static void DrawHangman(int stage)
         {
-
             Console.WriteLine(" +---+");
             Console.WriteLine(" |   |");
             Console.WriteLine($" |   {(stage >= 1 ? "O" : " ")}");
@@ -318,7 +314,6 @@ namespace ConsoleApp2
                 }
             }
         }
-
         // It returns a List of stories, where each story has a Title, Text, and List of Questions
         static List<(string Title, string Text, List<(string Prompt, string[] Choices, char Answer)> Questions)>
             LoadStories(string filePath) // is basically our easy, normal and hard txt file so whatever filename we pass we call either easy, normal or hard
@@ -428,7 +423,7 @@ namespace ConsoleApp2
         }
 
         //  DISPLAY 
-        static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions)
+        static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
             
             bool goBackToStory = false;
@@ -442,18 +437,15 @@ namespace ConsoleApp2
                 {
                     Console.Clear();
 
-                    // Story stays visible at the top
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("╔══════════════════════════════════════╗");
-                    Console.WriteLine("║  " + title.PadRight(38) + "║");
-                    Console.WriteLine("╚══════════════════════════════════════╝");
+                    Console.WriteLine("╔════════════════════════════════════════════════════════╗");
+                    Console.WriteLine("║           " + title.PadRight(45) + "║");
+                    Console.WriteLine("╚════════════════════════════════════════════════════════╝");
                     Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine("\n" + text + "\n");
                     Console.ResetColor();
-
                     Console.WriteLine("--------------------------------------------");
-
                     // Question below the story
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine("\n" + q.Prompt);
@@ -461,14 +453,12 @@ namespace ConsoleApp2
                     foreach (var choice in q.Choices)
                         Console.WriteLine(choice);
                     Console.Write("\nYour answer: ");
-                    string input = Console.ReadLine()?.Trim().ToUpper() ?? "";
-
+                    string input = Console.ReadLine().Trim().ToUpper();
                     if (input == "BACK")
                     {
                         goBackToStory = true;
                         break;
                     }
-
                     if (input.Length > 0 && input[0] == q.Answer)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -492,6 +482,20 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\nYou got {score}/{questions.Count} correct!");
                     Console.ResetColor();
+                    if (score >= questions.Count/2)
+                    {
+                        points += pointsIfPass;
+                        Console.ForegroundColor= ConsoleColor.Green;
+                        Console.WriteLine("Points: " + points);
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        points -= pointsifNot;
+                        Console.ForegroundColor= ConsoleColor.Red;
+                        Console.WriteLine("Points: " + points);
+                        Console.ResetColor();
+                    }
                     goBackToStory = false;
                     Console.ReadKey();
                     gamemenu();
@@ -507,21 +511,21 @@ namespace ConsoleApp2
             var stories = LoadStories("easy1.txt");
             if (stories.Count == 0) return;
             var picked = stories[rng.Next(stories.Count)];
-            DisplayStory(picked.Title, picked.Text, picked.Questions);
+            DisplayStory(picked.Title, picked.Text, picked.Questions, 10, 4);
         }
         static void medium()
         {
             var stories = LoadStories("medium.txt");
             if (stories.Count == 0) return;
             var picked = stories[rng.Next(stories.Count)];
-            DisplayStory(picked.Title, picked.Text, picked.Questions);
+            DisplayStory(picked.Title, picked.Text, picked.Questions, 20, 8);
         }
         static void hard()
         {
             var stories = LoadStories("hard.txt");
             if (stories.Count == 0) return;
             var picked = stories[rng.Next(stories.Count)];
-            DisplayStory(picked.Title, picked.Text, picked.Questions);
+            DisplayStory(picked.Title, picked.Text, picked.Questions, 40, 12);
         }
     }
 }
