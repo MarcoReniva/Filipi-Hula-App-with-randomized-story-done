@@ -117,7 +117,7 @@ namespace ConsoleApp2
                 string newpass = Console.ReadLine();
                 Console.Write("Confirm Password: ");
                 string confpass = Console.ReadLine();
-                Console.WriteLine("=================================");
+                Console.WriteLine("===================================");
                 if (newuser.Trim() == "" || newpass.Trim() == "" || confpass.Trim() == "")
                 {
                     Console.Clear();
@@ -140,7 +140,19 @@ namespace ConsoleApp2
                 {
                     string[] newaccount = { newuser + "," + confpass };
                     File.AppendAllLines("login.txt", newaccount);
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Thread.Sleep(500);
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Loading....");
+                        Console.ResetColor();
+                        Console.Clear();
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Registration Successfull!");
+                    Console.ResetColor();
                     mainmenu();
                     break;
                 }
