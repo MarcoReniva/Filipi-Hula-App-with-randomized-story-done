@@ -67,7 +67,7 @@ namespace ConsoleApp2
             {
                 Console.Clear();
                 Console.WriteLine("Username and Password cannot be empty");
-                return; // just return; mainmenu()'s loop will re-prompt
+                return;
             }
 
             if (!File.Exists("login.txt"))
@@ -84,7 +84,7 @@ namespace ConsoleApp2
             {
                 Console.Clear();
                 Console.WriteLine("No accounts found. Please register first.");
-                return; // ← was mainmenu(), which caused the nesting bug
+                return; 
             }
 
             foreach (string line in lines)
@@ -101,7 +101,7 @@ namespace ConsoleApp2
             }
 
             Console.WriteLine("Invalid username or password. Try again.");
-            return; // ← was mainmenu()
+            return; 
         }
 
         static void regist()
