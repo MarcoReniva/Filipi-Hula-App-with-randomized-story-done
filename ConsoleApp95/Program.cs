@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,10 +18,8 @@ namespace ConsoleApp2
         static void Main(string[] args)
         {
             mainmenu();
-            int points = 0;
             Console.ReadKey();
         }
-
         static void mainmenu()
         {
             bool try2 = false;
@@ -420,19 +418,7 @@ namespace ConsoleApp2
         //  DISPLAY 
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions)
         {
-            // Story displays ONCE
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("╔══════════════════════════════════════╗");
-            Console.WriteLine("║  " + title.PadRight(38) + "║");
-            Console.WriteLine("╚══════════════════════════════════════╝");
-            Console.ResetColor();
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\n" + text + "\n");
-            Console.ResetColor();
-            Console.WriteLine("Press any key to answer the questions...");
-            Console.ReadKey();
-
+            
             bool goBackToStory = false;
 
             do
@@ -498,7 +484,7 @@ namespace ConsoleApp2
                     Console.ReadKey();
                     gamemenu();
                     break;
-                   
+
                 }
 
             } while (goBackToStory);
