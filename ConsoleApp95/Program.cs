@@ -18,6 +18,10 @@ namespace ConsoleApp2
         static Random rng = new Random();
         static void Main(string[] args)
         {
+             string CurrentUser = "me";
+             int points = 0;
+             var wordDictionary = DictionaryInput();
+            
             mainmenu();
             Console.ReadKey();
         }
@@ -176,7 +180,7 @@ namespace ConsoleApp2
                 switch (output2)
                 {
                     case "1":
-                        HangmanMenu(currentUser, points);
+                         HangmanMenu(CurrentUser, points, wordDictionary);
                         try3 = true;
                         break;
                     case "2":
@@ -211,6 +215,36 @@ namespace ConsoleApp2
             Console.WriteLine(" |");
             Console.WriteLine("_|_");
         }
+        static Dictionary<string, (string type, string definition, string example)> DictionaryInput()
+{
+    string[] words = File.ReadAllLines("Dictionaries.txt");
+
+    var wordDictionary = new Dictionary<string, (string type, string definition, string example)>();
+
+    for (int w = 0; w < words.Length; w++)
+    {
+        string[] wordcategory = words[w].Split(',');
+
+        if (wordcategory.Length >= 4) //Checks if the amt is enough so it wouldnt cause error
+        {
+            wordDictionary.Add(
+                wordcategory[0],
+                (wordcategory[1], wordcategory[2], wordcategory[3])
+            );
+        }
+    }
+    return wordDictionary;
+}
+static (string, string) WordRandomizer(Dictionary<string, (string type, string definition, string example)> wordDictionary)
+{
+    Random random = new Random();
+
+    int randomIndex = random.Next(wordDictionary.Count);
+
+    var randomEntry = wordDictionary.ElementAt(randomIndex);
+
+    return (randomEntry.Key, randomEntry.Value.definition);
+}
         static void HangmanMenu(string currentUser, int points)
         {
             bool exitchoice = false;
@@ -240,7 +274,7 @@ namespace ConsoleApp2
                     case "1":
                         exitchoice = true;
                         Console.Clear();
-                        HangmanEasy();
+                        HangmanEasy(currentUser, points, wordDictionary);
                         break;
                     case "2":
                         exitchoice = true;
@@ -255,7 +289,7 @@ namespace ConsoleApp2
                     case "0":
                         exitchoice = true;
                         Console.Clear();
-                        //MAIN MENU HERE
+                        gamemenu();
                         break;
                     default:
                         Console.WriteLine(" [Please enter a correct option.]");
@@ -263,9 +297,35 @@ namespace ConsoleApp2
                 }
             }
         }
-        static void HangmanEasy()
+       static void HangmanEasy(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
-            Console.WriteLine("EASY MODE");
+            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            int wrongGuesses = 0;
+            Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
+            Console.WriteLine("\n=====================================");
+            Console.WriteLine("        HANGMAN EASY MODE       ");
+            Console.WriteLine("=====================================");
+            Console.WriteLine("> Are you ready to play?");
+            DrawHangman(wrongGuesses);
+        
+            // word here with defintion
+            foreach (char w in hangmanword)
+            {
+                Console.Write(w);
+            }
+        
+            
+        
+            Console.WriteLine("\nEnter a letter in the space below.");
+            string letter = Console.ReadLine();
+        
+            //if letter not in word, add to wrong guesses and display in list
+            /*if (actualword.Contains(letter))
+            {
+        
+            }*/
+        
+        
         }
         static void HangmanNormal()
         {
