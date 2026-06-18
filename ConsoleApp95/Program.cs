@@ -16,12 +16,11 @@ namespace ConsoleApp2
         static string currentUser = "";
         static int points = 0;
         static Random rng = new Random();
+        static Dictionary<string, (string type, string definition, string example)> wordDictionary;
+
         static void Main(string[] args)
         {
-             string CurrentUser = "me";
-             int points = 0;
-             var wordDictionary = DictionaryInput();
-            
+            wordDictionary = DictionaryInput();
             mainmenu();
             Console.ReadKey();
         }
@@ -89,7 +88,7 @@ namespace ConsoleApp2
             {
                 Console.Clear();
                 Console.WriteLine("No accounts found. Please register first.");
-                return; 
+                return;
             }
             foreach (string line in lines)
             {
@@ -99,12 +98,12 @@ namespace ConsoleApp2
                     Console.Clear();
                     currentUser = usern;
                     Console.WriteLine("Login successful! Welcome, " + usern + "!");
-                    gamemenu();
+                    gamemenu(wordDictionary);
                     return;
                 }
             }
             Console.WriteLine("Invalid username or password. Try again.");
-            return; 
+            return;
         }
         static void regist()
         {
@@ -160,7 +159,7 @@ namespace ConsoleApp2
                 }
             }
         }
-        static void gamemenu()
+        static void gamemenu(Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             bool try3 = false;
             while (!try3)
@@ -180,7 +179,7 @@ namespace ConsoleApp2
                 switch (output2)
                 {
                     case "1":
-                         HangmanMenu(CurrentUser, points, wordDictionary);
+                        HangmanMenu(currentUser, points, wordDictionary);
                         try3 = true;
                         break;
                     case "2":
@@ -216,36 +215,36 @@ namespace ConsoleApp2
             Console.WriteLine("_|_");
         }
         static Dictionary<string, (string type, string definition, string example)> DictionaryInput()
-{
-    string[] words = File.ReadAllLines("Dictionaries.txt");
-
-    var wordDictionary = new Dictionary<string, (string type, string definition, string example)>();
-
-    for (int w = 0; w < words.Length; w++)
-    {
-        string[] wordcategory = words[w].Split(',');
-
-        if (wordcategory.Length >= 4) //Checks if the amt is enough so it wouldnt cause error
         {
-            wordDictionary.Add(
-                wordcategory[0],
-                (wordcategory[1], wordcategory[2], wordcategory[3])
-            );
+            string[] words = File.ReadAllLines("Dictionaries.txt");
+
+            var wordDictionary = new Dictionary<string, (string type, string definition, string example)>();
+
+            for (int w = 0; w < words.Length; w++)
+            {
+                string[] wordcategory = words[w].Split(',');
+
+                if (wordcategory.Length >= 4) //Checks if the amt is enough so it wouldnt cause error
+                {
+                    wordDictionary.Add(
+                        wordcategory[0],
+                        (wordcategory[1], wordcategory[2], wordcategory[3])
+                    );
+                }
+            }
+            return wordDictionary;
         }
-    }
-    return wordDictionary;
-}
-static (string, string) WordRandomizer(Dictionary<string, (string type, string definition, string example)> wordDictionary)
-{
-    Random random = new Random();
+        static (string, string) WordRandomizer(Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        {
+            Random random = new Random();
 
-    int randomIndex = random.Next(wordDictionary.Count);
+            int randomIndex = random.Next(wordDictionary.Count);
 
-    var randomEntry = wordDictionary.ElementAt(randomIndex);
+            var randomEntry = wordDictionary.ElementAt(randomIndex);
 
-    return (randomEntry.Key, randomEntry.Value.definition);
-}
-        static void HangmanMenu(string currentUser, int points)
+            return (randomEntry.Key, randomEntry.Value.definition);
+        }
+        static void HangmanMenu(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             bool exitchoice = false;
             for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
@@ -289,7 +288,7 @@ static (string, string) WordRandomizer(Dictionary<string, (string type, string d
                     case "0":
                         exitchoice = true;
                         Console.Clear();
-                        gamemenu();
+                        gamemenu(wordDictionary);
                         break;
                     default:
                         Console.WriteLine(" [Please enter a correct option.]");
@@ -297,7 +296,7 @@ static (string, string) WordRandomizer(Dictionary<string, (string type, string d
                 }
             }
         }
-       static void HangmanEasy(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static void HangmanEasy(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
             int wrongGuesses = 0;
@@ -307,25 +306,25 @@ static (string, string) WordRandomizer(Dictionary<string, (string type, string d
             Console.WriteLine("=====================================");
             Console.WriteLine("> Are you ready to play?");
             DrawHangman(wrongGuesses);
-        
+
             // word here with defintion
             foreach (char w in hangmanword)
             {
                 Console.Write(w);
             }
-        
-            
-        
+
+
+
             Console.WriteLine("\nEnter a letter in the space below.");
             string letter = Console.ReadLine();
-        
+
             //if letter not in word, add to wrong guesses and display in list
             /*if (actualword.Contains(letter))
             {
         
             }*/
-        
-        
+
+
         }
         static void HangmanNormal()
         {
@@ -485,7 +484,7 @@ static (string, string) WordRandomizer(Dictionary<string, (string type, string d
         //  DISPLAY 
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
-            
+
             bool goBackToStory = false;
 
             do
@@ -524,43 +523,27 @@ static (string, string) WordRandomizer(Dictionary<string, (string type, string d
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("Correct!");
                         Console.ResetColor();
+                        points += pointsIfPass;
                         score++;
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
+                        points -= pointsifNot;
                         Console.WriteLine($"Wrong! The correct answer is {q.Answer}.");
                         Console.ResetColor();
                     }
-
                     Console.ReadKey();
                 }
-
                 if (!goBackToStory)
                 {
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\nYou got {score}/{questions.Count} correct!");
+                    Console.WriteLine("Total Points: " + points);
                     Console.ResetColor();
-                    if (score >= questions.Count/2)
-                    {
-                        points += pointsIfPass;
-                        Console.ForegroundColor= ConsoleColor.Green;
-                        Console.WriteLine("Points: " + points);
-                        Console.ResetColor();
-                    }
-                    else
-                    {
-                        points -= pointsifNot;
-                        Console.ForegroundColor= ConsoleColor.Red;
-                        Console.WriteLine("Points: " + points);
-                        Console.ResetColor();
-                    }
-                    goBackToStory = false;
-                    Console.ReadKey();
-                    gamemenu();
+                    gamemenu(wordDictionary);
                     break;
-
                 }
 
             } while (goBackToStory);
