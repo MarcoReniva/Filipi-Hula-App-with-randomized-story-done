@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -15,7 +16,7 @@ namespace ConsoleApp2
     internal class Program
     {
         static string currentUser = "";
-        static int points = 0;
+        static int points;
         static Random rng = new Random();
         static Dictionary<string, (string type, string definition, string example)> wordDictionary;
 
@@ -91,18 +92,37 @@ namespace ConsoleApp2
                 Console.WriteLine("No accounts found. Please register first.");
                 return;
             }
-            foreach (string line in lines)
+            // to display points on top next to the username 
+            for (int i = 0; i < lines.Length;i++)
             {
-                string[] parts = line.Split(',');
+                string[] parts = lines[i].Split(',');
                 if (parts.Length >= 2 && parts[0] == usern && parts[1] == pass)
                 {
                     Console.Clear();
                     currentUser = usern;
-                    Console.WriteLine("Login successful! Welcome, " + usern + "!");
-                    gamemenu(wordDictionary);
-                    return;
+
+                    // to Load users points if they have to the leaderboard 
+                    points = 0; // reset first
+                    if (File.Exists("Leaderboard.txt"))
+                    {
+                        foreach (string lbLine in File.ReadAllLines("Leaderboard.txt"))
+                        {
+                            string[] lbParts = lbLine.Split(',');
+                            if (lbParts.Length >= 2 && lbParts[0] == currentUser)
+                            {
+                                int.TryParse(lbParts[1], out points);
+                                break;
+                            }
+                        }
+                    }
                 }
+            
+
+                Console.WriteLine("Login successful! Welcome, " + usern + "!");
+                gamemenu(wordDictionary);
+                return;
             }
+           
             Console.WriteLine("Invalid username or password. Try again.");
             return;
         }
@@ -188,6 +208,7 @@ namespace ConsoleApp2
                         try3 = true;
                         break;
                     case "3":
+                        Leaderboard();
                         break;
                     case "4":
                         break;
@@ -204,6 +225,11 @@ namespace ConsoleApp2
                         break;
                 }
             }
+        }
+        static void Leaderboard()
+        {
+            string[]leaderboard = File.ReadAllLines("Leaderboard.txt");
+            Console.WriteLine(leaderboard);
         }
         static void DrawHangman(int stage)
         {
@@ -304,7 +330,7 @@ namespace ConsoleApp2
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
-        
+
             while (playing)
             {
                 Console.Clear();
@@ -325,9 +351,9 @@ namespace ConsoleApp2
                         Console.Write("_");
                     }
                 }
-        
+
                 Console.WriteLine("\nMeaning: " + hangmandefinition);
-        
+
                 if (WrongLetters != null)
                 {
                     Console.Write("Wrong guesses: ");
@@ -336,22 +362,22 @@ namespace ConsoleApp2
                         Console.Write(w);
                     }
                 }
-        
+
                 Console.Write("\nGuess a letter: ");
                 string input = Console.ReadLine().ToLower();
-        
+
                 if (input.Length != 1) //it needs to be char
                 {
                     continue;
                 }
-        
+
                 char letter = input[0];
-        
+
                 if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
                 {
                     continue;
                 }
-        
+
                 if (hangmanword.Contains(letter))
                 {
                     CorrectLetters.Add(letter);
@@ -361,8 +387,8 @@ namespace ConsoleApp2
                     WrongLetters.Add(letter);
                     wrongGuesses++;
                 }
-               
-        
+
+
                 // Check win
                 bool won = true;
                 foreach (char c in hangmanword)
@@ -373,7 +399,7 @@ namespace ConsoleApp2
                         break;
                     }
                 }
-        
+
                 if (won)
                 {
                     Console.WriteLine("\nYou Win!");
@@ -383,7 +409,7 @@ namespace ConsoleApp2
                     Console.ReadKey();
                     return;
                 }
-        
+
                 if (wrongGuesses >= 6)
                 {
                     Console.WriteLine("\nYou Lose!");
@@ -395,8 +421,8 @@ namespace ConsoleApp2
                 }
             }
         }
-        
-        
+
+
         static void HangmanNormal(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
@@ -404,7 +430,7 @@ namespace ConsoleApp2
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
-        
+
             while (playing)
             {
                 Console.Clear();
@@ -425,10 +451,10 @@ namespace ConsoleApp2
                         Console.Write("_");
                     }
                 }
-        
+
                 Console.WriteLine("\nDo you want to unlock the definition? Doing this action will result to building your stickman by 1. Y/N");
                 string unlock = Console.ReadLine(); //STILL NEED TO FIX SO THE LOOP WONT REMOVE THIS
-                
+
                 if (unlock == "Y")
                 {
                     Console.WriteLine("\nMeaning: " + hangmandefinition);
@@ -438,13 +464,13 @@ namespace ConsoleApp2
                 {
                     continue;
                 }
-                else 
-                { 
-                    continue; 
+                else
+                {
+                    continue;
                 }
-        
-                
-        
+
+
+
                 if (WrongLetters != null)
                 {
                     Console.Write("Wrong guesses: ");
@@ -453,22 +479,22 @@ namespace ConsoleApp2
                         Console.Write(w);
                     }
                 }
-        
+
                 Console.Write("\nGuess a letter: ");
                 string input = Console.ReadLine().ToLower();
-        
+
                 if (input.Length != 1) //it needs to be char
                 {
                     continue;
                 }
-        
+
                 char letter = input[0];
-        
+
                 if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
                 {
                     continue;
                 }
-        
+
                 if (hangmanword.Contains(letter))
                 {
                     CorrectLetters.Add(letter);
@@ -478,8 +504,8 @@ namespace ConsoleApp2
                     WrongLetters.Add(letter);
                     wrongGuesses++;
                 }
-        
-        
+
+
                 // Check win
                 bool won = true;
                 foreach (char c in hangmanword)
@@ -490,7 +516,7 @@ namespace ConsoleApp2
                         break;
                     }
                 }
-        
+
                 if (won)
                 {
                     Console.WriteLine("\nYou Win!");
@@ -500,7 +526,7 @@ namespace ConsoleApp2
                     Console.ReadKey();
                     return;
                 }
-        
+
                 if (wrongGuesses >= 6)
                 {
                     Console.WriteLine("\nYou Lose!");
@@ -513,14 +539,14 @@ namespace ConsoleApp2
             }
         }
         static void HangmanHard(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
-            
+
         {
             var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
             List<char> CorrectLetters = new List<char>();
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
-        
+
             while (playing)
             {
                 Console.Clear();
@@ -541,7 +567,7 @@ namespace ConsoleApp2
                         Console.Write("_");
                     }
                 }
-        
+
                 if (WrongLetters != null)
                 {
                     Console.Write("Wrong guesses: ");
@@ -553,19 +579,19 @@ namespace ConsoleApp2
                 Console.WriteLine();
                 Console.Write("\nGuess a letter: ");
                 string input = Console.ReadLine().ToLower();
-        
+
                 if (input.Length != 1) //it needs to be char
                 {
                     continue;
                 }
-        
+
                 char letter = input[0];
-        
+
                 if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
                 {
                     continue;
                 }
-        
+
                 if (hangmanword.Contains(letter))
                 {
                     CorrectLetters.Add(letter);
@@ -575,8 +601,8 @@ namespace ConsoleApp2
                     WrongLetters.Add(letter);
                     wrongGuesses++;
                 }
-        
-        
+
+
                 // Check win
                 bool won = true;
                 foreach (char c in hangmanword)
@@ -587,7 +613,7 @@ namespace ConsoleApp2
                         break;
                     }
                 }
-        
+
                 if (won)
                 {
                     Console.WriteLine("\nYou Win!");
@@ -597,7 +623,7 @@ namespace ConsoleApp2
                     Console.ReadKey();
                     return;
                 }
-        
+
                 if (wrongGuesses >= 6)
                 {
                     Console.WriteLine("\nYou Lose!");
@@ -819,13 +845,13 @@ namespace ConsoleApp2
                     string file = "Leaderboard.txt";
                     string[] lines = File.Exists(file) ? File.ReadAllLines(file) : new string[0]; // this is basically just a shortened version of if else 
                     bool userfound = false;
-                    for(int i = 0; i < lines.Length;i++)
+                    for (int i = 0; i < lines.Length; i++)
                     {
                         string[] parts = lines[i].Split(',');
 
                         if (currentUser == parts[0])
                         {
-                            int existingpoints = int .Parse(parts[1]);
+                            int existingpoints = int.Parse(parts[1]);
                             if (points > existingpoints)
                             {
                                 lines[i] = currentUser + "," + points;
@@ -833,7 +859,7 @@ namespace ConsoleApp2
                             userfound = true;
                             break;
                         }
-                      
+
                     }
                     if (!userfound)
                     {
