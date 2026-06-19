@@ -210,6 +210,7 @@ namespace ConsoleApp2
                         Leaderboard();
                         break;
                     case "4":
+                        DictionaryView(wordDictionary);
                         break;
                     case "5":
                         currentUser = "";
@@ -940,6 +941,25 @@ namespace ConsoleApp2
 
             } while (goBackToStory);
         }
+            static void DictionaryView(Dictionary<string, (string type, string definition, string example)> wordDictionary)
+         {
+             int amt = 0;
+             Console.WriteLine("\n=====================================");
+             Console.WriteLine("        Dictionary        ");
+             Console.WriteLine("=====================================");
+        
+             foreach (var entry in wordDictionary.OrderBy(x => x.Key))
+             {
+                 Console.WriteLine("\nWord: " + entry.Key);
+                 Console.WriteLine("Type: " + entry.Value.type);
+                 Console.WriteLine("Definition: " + entry.Value.definition);
+                 Console.WriteLine("Example: " + entry.Value.example);
+                 Console.WriteLine("-------------------------------------");
+             }
+        
+             Console.WriteLine("\nPress any key to go back to main menu...");
+             Console.ReadKey();
+         }
         // point calculation
         static void calcu()
         {
