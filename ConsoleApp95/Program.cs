@@ -90,10 +90,10 @@ namespace ConsoleApp2
             {
                 Console.Clear();
                 Console.WriteLine("No accounts found. Please register first.");
-                return;
+                mainmenu();
             }
             // to display points on top next to the username 
-            for (int i = 0; i < lines.Length;i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length >= 2 && parts[0] == usern && parts[1] == pass)
@@ -114,15 +114,13 @@ namespace ConsoleApp2
                                 break;
                             }
                         }
+                        Console.WriteLine("Login successful! Welcome, " + usern + "!");
+                        gamemenu(wordDictionary);
+                        return;
                     }
                 }
-            
-
-                Console.WriteLine("Login successful! Welcome, " + usern + "!");
-                gamemenu(wordDictionary);
-                return;
             }
-           
+
             Console.WriteLine("Invalid username or password. Try again.");
             return;
         }
@@ -182,6 +180,7 @@ namespace ConsoleApp2
         }
         static void gamemenu(Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
+            Console.Clear();
             bool try3 = false;
             while (!try3)
             {
@@ -228,8 +227,49 @@ namespace ConsoleApp2
         }
         static void Leaderboard()
         {
-            string[]leaderboard = File.ReadAllLines("Leaderboard.txt");
-            Console.WriteLine(leaderboard);
+            string[] leaderboard = File.ReadAllLines("Leaderboard.txt");
+
+            // Bubble sort to sort from highest to lowest
+            for (int i = 0; i < leaderboard.Length - 1; i++)
+            {
+                for (int j = 0; j < leaderboard.Length - 1 - i; j++)
+                {
+                    if (leaderboard[j] == "" || leaderboard[j + 1] == "") continue;
+
+                    string[] partsA = leaderboard[j].Split(',');
+                    string[] partsB = leaderboard[j + 1].Split(',');
+
+                    int pointsA = int.Parse(partsA[1]);
+                    int pointsB = int.Parse(partsB[1]);
+                    // Swap if current is less than next
+                    if (pointsA < pointsB)
+                    {
+                        string temp = leaderboard[j];
+                        leaderboard[j] = leaderboard[j + 1];
+                        leaderboard[j + 1] = temp;
+                    }
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("=================================================");
+            Console.WriteLine("                    Leaderboard                  ");
+            Console.WriteLine("=================================================");
+            Console.WriteLine(String.Format("{0,-5}{1,-20}{2,-10}", "#", "USER", "POINTS"));
+            Console.WriteLine("-------------------------------------------------");
+            int rank = 1;
+            for (int i = 0; i < leaderboard.Length; i++)
+            {
+                if (leaderboard[i] != "")
+                {
+                    string[] parts = leaderboard[i].Split(',');
+                    Console.WriteLine(String.Format("{0,-5}{1,-20}{2,-10}", rank, parts[0], parts[1]));
+                    rank++;
+                }
+            }
+            Console.WriteLine();
+            Console.WriteLine("Press any key to go back");
+            Console.ReadKey();
+            gamemenu(wordDictionary);
         }
         static void DrawHangman(int stage)
         {
@@ -468,9 +508,6 @@ namespace ConsoleApp2
                 {
                     continue;
                 }
-
-
-
                 if (WrongLetters != null)
                 {
                     Console.Write("Wrong guesses: ");
@@ -637,6 +674,7 @@ namespace ConsoleApp2
         }
         static void Readingcomp()
         {
+            Console.Clear();
             bool try4 = false;
             while (!try4)
             {
@@ -770,7 +808,6 @@ namespace ConsoleApp2
                     currentAnswer = line.Substring(4).Trim()[0];  // Substring(4) skips "ANS:" then [0] grabs just the first character e.g. 'B'
                 }
             }
-
             // Saves last story
             if (inStory)
             {
@@ -781,7 +818,6 @@ namespace ConsoleApp2
 
             return stories;
         }
-
         //  DISPLAY 
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
@@ -842,39 +878,45 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\nYou got {score}/{questions.Count} correct!");
                     Console.WriteLine("Total Points: " + points);
-                    string file = "Leaderboard.txt";
-                    string[] lines = File.Exists(file) ? File.ReadAllLines(file) : new string[0]; // this is basically just a shortened version of if else 
-                    bool userfound = false;
-                    for (int i = 0; i < lines.Length; i++)
-                    {
-                        string[] parts = lines[i].Split(',');
-
-                        if (currentUser == parts[0])
-                        {
-                            int existingpoints = int.Parse(parts[1]);
-                            if (points > existingpoints)
-                            {
-                                lines[i] = currentUser + "," + points;
-                            }
-                            userfound = true;
-                            break;
-                        }
-
-                    }
-                    if (!userfound)
-                    {
-                        File.AppendAllText(file, currentUser + "," + points + "\n");
-                    }
-                    if (userfound)
-                    {
-                        File.WriteAllLines(file, lines);
-                    }
+                    Console.ResetColor();
+                    calcu();
                     gamemenu(wordDictionary);
                     break;
                 }
 
             } while (goBackToStory);
         }
+        // point calculation
+        static void calcu()
+        {
+            string file = "Leaderboard.txt";
+            string[] lines = File.Exists(file) ? File.ReadAllLines(file) : new string[0]; // this is basically just a shortened version of if else 
+            bool userfound = false;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string[] parts = lines[i].Split(',');
+                if (currentUser == parts[0])
+                {
+                    int existingpoints = int.Parse(parts[1]);
+
+                    if (parts.Length >= 2 && currentUser == parts[0])
+                    {
+                        lines[i] = currentUser + "," + points;
+                    }
+                    userfound = true;
+                    break;
+                }
+            }
+            if (!userfound)
+            {
+                File.AppendAllText(file, currentUser + "," + points + "\n");
+            }
+            if (userfound)
+            {
+                File.WriteAllLines(file, lines);
+            }
+        }
+
         //  LEVELS 
         static void easy()
         {
