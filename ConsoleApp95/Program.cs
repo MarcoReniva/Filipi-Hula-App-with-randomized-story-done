@@ -31,14 +31,31 @@ namespace ConsoleApp2
             bool try2 = false;
             while (!try2)
             {
-                Console.WriteLine("=====================================");
-                Console.WriteLine("        Welcome to FILIPI-HULA         ");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("[1].Login");
-                Console.WriteLine("[2].Register");
-                Console.WriteLine("[3].Exit");
-                Console.Write("choose an option: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║    ___ ___ _    ___ ___ ___       _  _ _   _ _      _       ║");
+                Console.WriteLine(@"  ║   | __|_ _| |  |_ _| _ \_ _|___  | || | | | | |    /_\      ║");
+                Console.WriteLine(@"  ║   | _| | || |__ | ||  _/| |____| | __ | |_| | |__ / _ \     ║");
+                Console.WriteLine(@"  ║   |_| |___|____|___|_| |___|     |_||_|\___/|____/_/ \_\    ║");
+                Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║  +======+  ║                                                ║");
+                Console.WriteLine(@"  ║  |      |  ║                                                ║");
+                Console.WriteLine(@"  ║  O      |  ║             [ 1 ] > START / LOGIN              ║");
+                Console.WriteLine(@"  ║ /|\     |  ║             [ 2 ] > CREATE ACCOUNT             ║");
+                Console.WriteLine(@"  ║ / \     |  ║             [ 3 ] > EXIT GAME                  ║");
+                Console.WriteLine(@"  ║         |  ║                                                ║");
+                Console.WriteLine(@"  ║         |  ║                                                ║");
+                Console.WriteLine(@"  ║ ===========║                                                ║");
+                Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- INPUT PROMPT ---
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("    Enter your command (1-3) : ");
+                Console.ResetColor(); 
+
                 string output = Console.ReadLine();
+
                 switch (output)
                 {
                     case "1":
@@ -55,7 +72,7 @@ namespace ConsoleApp2
                         break;
                     default:
                         Console.Clear();
-                        Console.WriteLine("Invalid Option pls enter either 1, 2 or 3");
+                        Console.WriteLine("Invalid Option please enter either 1, 2 or 3");
                         try2 = false;
                         break;
                 }
@@ -64,142 +81,357 @@ namespace ConsoleApp2
 
         static void login()
         {
-            Console.Write("Enter Username: ");
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════════════╗");
+            Console.WriteLine(@"  ║                       [ SYSTEM AUTHENTICATION ]                     ║");
+            Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════════════╣");
+            Console.WriteLine(@"  ║                                                                     ║");
+            Console.WriteLine(@"  ║             .--------.                                              ║");
+            Console.WriteLine(@"  ║            /  ____  \                                               ║");
+            Console.WriteLine(@"  ║           |  /    \  |                                              ║");
+            Console.WriteLine(@"  ║           | |      | |     AWAITING USER CREDENTIALS...             ║");
+            Console.WriteLine(@"  ║          _| |______| |_                                             ║");
+            Console.WriteLine(@"  ║         /              \   ====================================     ║");
+            Console.WriteLine(@"  ║        |  .----------.  |                                           ║");
+            Console.WriteLine(@"  ║        |  |   ____   |  |  * UNAUTHORIZED ACCESS PROHIBITED *       ║");
+            Console.WriteLine(@"  ║        |  |   |  |   |  |                                           ║");
+            Console.WriteLine(@"  ║        |  |   |  O   |  |  ====================================     ║");
+            Console.WriteLine(@"  ║        |  |   | /|\  |  |                                           ║");
+            Console.WriteLine(@"  ║        |  |   | / \  |  |  PLEASE ENTER YOUR LOGIN DATA BELOW.      ║");
+            Console.WriteLine(@"  ║        |  |  /____\  |  |                                           ║");
+            Console.WriteLine(@"  ║        |  '----------'  |                                           ║");
+            Console.WriteLine(@"  ║         \______________/                                            ║");
+            Console.WriteLine(@"  ║                                                                     ║");
+            Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════════════╝");
+            Console.WriteLine();
+
+            // --- INPUT FIELDS ---
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("       > USERNAME : ");
+            Console.ResetColor();
             string usern = Console.ReadLine();
-            Console.Write("Enter Password: ");
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("       > PASSWORD : ");
+            Console.ResetColor();
             string pass = Console.ReadLine();
 
-            if (usern == "" || pass == "")
+            // --- 1. VALIDATION: EMPTY FIELDS (Fixed WarningPopup arguments) ---
+            if (string.IsNullOrWhiteSpace(usern) || string.IsNullOrWhiteSpace(pass))
             {
                 Console.Clear();
-                Console.WriteLine("Username and Password cannot be empty");
+                WarningPopup("EMPTY DATA", "Username and Password cannot be empty.");
                 return;
             }
 
+            // --- 2. VALIDATION: FILE MISSING (Fixed WarningPopup arguments) ---
             if (!File.Exists("login.txt"))
             {
                 Console.Clear();
-                Console.WriteLine("No accounts found. Please register first.");
+                WarningPopup("DATABASE NOT FOUND", "No accounts found. Please register first.");
                 return;
             }
 
+            // --- 3. VALIDATION: USER CHECK (Fixed WarningPopup arguments) ---
             string[] lines = File.ReadAllLines("login.txt");
             bool userExists = lines.Any(line => line.Split(',')[0] == usern);
 
             if (!userExists)
             {
                 Console.Clear();
-                Console.WriteLine("No accounts found. Please register first.");
-                mainmenu();
+                WarningPopup("USER NOT RECOGNIZED", "Account not found. Please register first.");
+                return; // Use return instead of mainmenu() to avoid infinite stacking loops
             }
-            // to display points on top next to the username 
+
+            // --- 4. PASSWORD VERIFICATION (Fixed logic loop) ---
+            bool loginSuccess = false;
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] parts = lines[i].Split(',');
                 if (parts.Length >= 2 && parts[0] == usern && parts[1] == pass)
                 {
-                    Console.Clear();
-                    currentUser = usern;
-
-                    // to Load users points if they have to the leaderboard 
-                    points = 0; // reset first
-                    if (File.Exists("Leaderboard.txt"))
-                    {
-                        foreach (string lbLine in File.ReadAllLines("Leaderboard.txt"))
-                        {
-                            string[] lbParts = lbLine.Split(',');
-                            if (lbParts.Length >= 2 && lbParts[0] == currentUser)
-                            {
-                                int.TryParse(lbParts[1], out points);
-                                break;
-                            }
-                        }
-                        Console.WriteLine("Login successful! Welcome, " + usern + "!");
-                        gamemenu(wordDictionary);
-                        return;
-                    }
+                    loginSuccess = true;
+                    break; // Stop looking, we found the right password!
                 }
             }
 
-            Console.WriteLine("Invalid username or password. Try again.");
-            return;
+            // --- 5. LOGIN RESULT ---
+            if (loginSuccess)
+            {
+                Console.Clear();
+                currentUser = usern;
+
+                // to Load users points if they have to the leaderboard 
+                points = 0; // reset first
+                if (File.Exists("Leaderboard.txt"))
+                {
+                    foreach (string lbLine in File.ReadAllLines("Leaderboard.txt"))
+                    {
+                        string[] lbParts = lbLine.Split(',');
+                        if (lbParts.Length >= 2 && lbParts[0] == currentUser)
+                        {
+                            int.TryParse(lbParts[1], out points);
+                            break;
+                        }
+                    }
+                }
+
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                // Unlocked Padlock ASCII art!
+                Console.WriteLine(@"                                   ____  ");
+                Console.WriteLine(@"                                  /    \ ");
+                Console.WriteLine(@"                                 |      |");
+                Console.WriteLine(@"                                 |      |");
+                Console.WriteLine(@"                              ___|      |");
+                Console.WriteLine(@"                             /          \ ");
+                Console.WriteLine(@"                            |  .------.  |");
+                Console.WriteLine(@"                            |  | [OK] |  |");
+                Console.WriteLine(@"                            |  |      |  |");
+                Console.WriteLine(@"                            |  '------'  |");
+                Console.WriteLine(@"                             \__________/ ");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║                       [ A C C E S S   G R A N T E D ]               ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════════════╝");
+
+                Console.ResetColor();
+                Console.WriteLine($"\n                       Welcome back, {currentUser}!");
+                Console.WriteLine($"                       Current Points: {points}");
+
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("\n                       game loading...\n");
+                Console.ResetColor();
+
+                System.Threading.Thread.Sleep(1500); // Gives them a second to enjoy the unlock screen
+
+                gamemenu(wordDictionary);
+            }
+            else
+            {
+                // If the loop finished and loginSuccess is STILL false, the password was wrong!
+                Console.Clear();
+                WarningPopup("ACCESS DENIED", "Invalid password. Intruder Alert.");
+                return;
+            }
         }
+
+        static void WarningPopup(string errorTitle, string errorDetail)
+        {
+            Console.Clear();
+            Console.Beep(800, 200);
+            Console.Beep(600, 300);
+
+            Console.WriteLine("\n\n");
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(@"        ╔════════════════════════════════════════════════════════╗");
+            Console.WriteLine(@"        ║                 [ S Y S T E M  A L E R T ]             ║");
+            Console.WriteLine(@"        ╠════════════════════════════════════════════════════════╣");
+            Console.WriteLine(@"        ║                        _______                         ║");
+            Console.WriteLine(@"        ║                       /       \                        ║");
+            Console.WriteLine(@"        ║                      /    !    \                       ║");
+            Console.WriteLine(@"        ║                     /___________\                      ║");
+            Console.WriteLine(@"        ║                                                        ║");
+
+            // Centers the error title dynamically
+            int titlePadding = (54 - errorTitle.Length) / 2;
+            Console.Write(@"        ║");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write("".PadLeft(Math.Max(0, titlePadding)) + errorTitle + "".PadRight(Math.Max(0, 54 - titlePadding - errorTitle.Length)));
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(@"║");
+
+            // Centers the error detail dynamically
+            int detailPadding = (54 - errorDetail.Length) / 2;
+            Console.Write(@"        ║");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("".PadLeft(Math.Max(0, detailPadding)) + errorDetail + "".PadRight(Math.Max(0, 54 - detailPadding - errorDetail.Length)));
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(@"║");
+
+            Console.WriteLine(@"        ║                                                        ║");
+            Console.WriteLine(@"        ║                   [  Tap to Continue  ]                ║");
+            Console.WriteLine(@"        ╚════════════════════════════════════════════════════════╝");
+
+            // --- 3D DROP SHADOW EFFECT ---
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(@"          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
+
+            Console.ResetColor();
+            Console.ReadKey();
+        }
+
         static void regist()
         {
             bool regis = false;
             Console.Clear();
             while (!regis)
             {
-                Console.WriteLine("========Account Registration=====");
-                Console.Write("Enter new username: ");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                // --- CUSTOM ID BADGE ASCII ART ---
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║                     [ NEW USER REGISTRATION ]                       ║");
+                Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║                                                                     ║");
+                Console.WriteLine(@"  ║         [  NEW ACCOUNT  ]                                           ║");
+                Console.WriteLine(@"  ║          _______________                                            ║");
+                Console.WriteLine(@"  ║         |  ___________  |                                           ║");
+                Console.WriteLine(@"  ║         | |     _     | |         INPUT CREDENTIALS BELOW.          ║");
+                Console.WriteLine(@"  ║         | |    ( )    | |                                           ║");
+                Console.WriteLine(@"  ║         | |   /| |\   | |                                           ║");
+                Console.WriteLine(@"  ║         | |  /_\_/_\  | |  ====================================     ║");
+                Console.WriteLine(@"  ║         | |___________| |        *  AWAITING NEW PLAYER  *          ║");
+                Console.WriteLine(@"  ║         |    _______    |  ====================================     ║");
+                Console.WriteLine(@"  ║         |   |_______|   |                                           ║");
+                Console.WriteLine(@"  ║         |_______________|                                           ║");
+                Console.WriteLine(@"  ║                                                                     ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- INPUT FIELDS ---
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("       > USERNAME : ");
+                Console.ResetColor();
                 string newuser = Console.ReadLine();
-                Console.Write("Enter new password: ");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("       > PASSWORD  : ");
+                Console.ResetColor();
                 string newpass = Console.ReadLine();
-                Console.Write("Confirm Password: ");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("       > CONFIRM PASSWORD : ");
+                Console.ResetColor();
                 string confpass = Console.ReadLine();
+
+                // --- PAUSE ---
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("\n       Loading...");
+                System.Threading.Thread.Sleep(600);
+                Console.ResetColor();
+
                 Console.WriteLine("===================================");
                 if (newuser.Trim() == "" || newpass.Trim() == "" || confpass.Trim() == "")
                 {
-                    Console.Clear();
-                    Console.WriteLine("Username and Password cannot be empty!");
-                    continue;
+                    WarningPopup("INVALID DATA", "Username and Passwords cannot be empty!");
+                    continue; // Restarts the while loop
                 }
+
+                // --- 2. VALIDATION: PASSWORD MATCH ---
                 if (confpass != newpass)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Password does not match!");
+                    WarningPopup("SECURITY ALERT", "Passwords do not match! Please try again.");
                     continue;
                 }
+
+                // --- 3. VALIDATION: USER EXISTS ---
                 if (File.Exists("login.txt") && File.ReadAllText("login.txt").Contains(newuser + ","))
                 {
-                    Console.Clear();
-                    Console.WriteLine("Account already exists!");
+                    WarningPopup("INVALID DATA", "Username already exists in the database.");
                     continue;
                 }
                 else
                 {
+                    // --- REGISTRATION SUCCESS LOGIC ---
                     string[] newaccount = { newuser + "," + confpass };
                     File.AppendAllLines("login.txt", newaccount);
-                    for (int i = 0; i < 5; i++)
-                    {
-                        Thread.Sleep(500);
-                        Console.Clear();
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Loading....");
-                        Console.ResetColor();
-                        Console.Clear();
-                    }
+
+                    // --- HACKER PROGRESS BAR ANIMATION ---
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("\n\n\n\n\n");
+                    Console.WriteLine(@"                    =======================================");
+                    Console.WriteLine(@"                         [     CREATING NEW ACCOUNT     ]");
+                    Console.WriteLine(@"                    =======================================");
+                    Console.Write("\n                      PROCESSING: [");
 
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Registration Successfull!");
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Console.Write("█"); // Fills the progress bar
+                        System.Threading.Thread.Sleep(100); // 100ms per block (2 seconds total)
+                    }
                     Console.ResetColor();
-                    mainmenu();
-                    break;
+                    Console.WriteLine("] 100%");
                 }
+
+                // --- SUCCESS REGIS ---
+                System.Threading.Thread.Sleep(500);
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(@"                                   *      *   *");
+                Console.WriteLine(@"                                 *   \    |   /   *");
+                Console.WriteLine(@"                                * - -  [ OK ] - - *");
+                Console.WriteLine(@"                                 *   /    |   \   *");
+                Console.WriteLine(@"                                   *      *   *");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║                     [ REGISTRATION SUCCESSFUL ]                     ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════════════╝");
+
+                Console.ResetColor();
+                Console.WriteLine($"\n                       Account created for: {newuser}");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("\n                              Tap to Continue...");
+                Console.ResetColor();
+                Console.ReadKey();
+
+                regis = true; // Breaks the loop
+                return; // Safely returns to mainmenu() without causing a stack overflow
             }
         }
+
         static void gamemenu(Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             Console.Clear();
             bool try3 = false;
             while (!try3)
             {
-                Console.WriteLine("Playing as: " + currentUser + " " + "Points: " + " " + points);
-                Console.WriteLine("=====================================");
-                Console.WriteLine("        Welcome to FILIPI-HULA         ");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("Choose your gamemode");
-                Console.WriteLine("[1]. Hangman");
-                Console.WriteLine("[2]. Reading Comprehension");
-                Console.WriteLine("[3]. Leaderboard");
-                Console.WriteLine("[4]. Dictionary");
-                Console.WriteLine("[5]. Go back");
-                Console.Write("Enter choice: ");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+               
+                string playerText = $"> USER: {currentUser}";
+                string pointsText = $"> SCORE: {points} PTS";
+                int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                if (spaces < 0) spaces = 0;
+
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.Write(@"  ║  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(playerText);
+                Console.Write(new string(' ', spaces));
+                Console.Write(pointsText);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ║");
+                Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║  .------.  ║                                                ║");
+                Console.WriteLine(@"  ║  | GAME |  ║                                                ║");
+                Console.WriteLine(@"  ║  | MENU |  ║             [ 1 ] > PLAY HANGMAN               ║");
+                Console.WriteLine(@"  ║  |______|  ║             [ 2 ] > READING COMPREHENSION      ║");
+                Console.WriteLine(@"  ║    _  _    ║             [ 3 ] > VIEW LEADERBOARD           ║");
+                Console.WriteLine(@"  ║  _| || |_  ║             [ 4 ] > WORD DICTIONARY            ║");
+                Console.WriteLine(@"  ║ |_  __  _| ║             [ 5 ] > LOGOUT & RETURN            ║");
+                Console.WriteLine(@"  ║   |_||_|   ║                                                ║");
+                Console.WriteLine(@"  ║       (B)  ║      >> SELECT YOUR NEXT CHALLENGE <<          ║");
+                Console.WriteLine(@"  ║    (A)     ║                                                ║");
+                Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- INPUT PROMPT ---
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("    Enter your command (1-5) : ");
+                Console.ResetColor();
                 string output2 = Console.ReadLine();
                 switch (output2)
                 {
                     case "1":
-                        HangmanMenu(currentUser,wordDictionary);
+                        HangmanMenu(currentUser, points, wordDictionary);
                         try3 = true;
                         break;
                     case "2":
@@ -220,7 +452,7 @@ namespace ConsoleApp2
                         break;
                     default:
                         Console.Clear();
-                        Console.WriteLine("Invalid Option pls enter either 1, 2, 3, 4 or 5");
+                        Console.WriteLine("Invalid Option please enter either 1, 2, 3, 4 or 5");
                         try3 = false;
                         break;
                 }
@@ -230,7 +462,7 @@ namespace ConsoleApp2
         {
             string[] leaderboard = File.ReadAllLines("Leaderboard.txt");
 
-            // Bubble sort to sort from highest to lowest
+            // Bubble sort 
             for (int i = 0; i < leaderboard.Length - 1; i++)
             {
                 for (int j = 0; j < leaderboard.Length - 1 - i; j++)
@@ -242,7 +474,7 @@ namespace ConsoleApp2
 
                     int pointsA = int.Parse(partsA[1]);
                     int pointsB = int.Parse(partsB[1]);
-                    // Swap if current is less than next
+                 
                     if (pointsA < pointsB)
                     {
                         string temp = leaderboard[j];
@@ -252,25 +484,79 @@ namespace ConsoleApp2
                 }
             }
             Console.Clear();
-            Console.WriteLine("=================================================");
-            Console.WriteLine("                    Leaderboard                  ");
-            Console.WriteLine("=================================================");
-            Console.WriteLine(String.Format("{0,-5}{1,-20}{2,-10}", "#", "USER", "POINTS"));
-            Console.WriteLine("-------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════════════╗");
+            Console.WriteLine(@"  ║             ___________                                             ║");
+            Console.WriteLine(@"  ║            '._==_==_=_.'      [ GLOBAL LEADERBOARD ]                ║");
+            Console.WriteLine(@"  ║            .-\:      /-.      ======================                ║");
+            Console.WriteLine(@"  ║           | (|:.     |) |          TOP PLAYERS                      ║");
+            Console.WriteLine(@"  ║            '-|:.     |-'                                            ║");
+            Console.WriteLine(@"  ║              \::.    /                                              ║");
+            Console.WriteLine(@"  ║               '::. .'                                               ║");
+            Console.WriteLine(@"  ║                 ) (                                                 ║");
+            Console.WriteLine(@"  ║               _.' '._                                               ║");
+            Console.WriteLine(@"  ║              `"""""" ""`                                            ║");
+            Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════════════╣");
+            Console.WriteLine(@"  ║  RANK  │           USERNAME           │         TOTAL SCORE         ║");
+            Console.WriteLine(@"  ╠════════╪══════════════════════════════╪═════════════════════════════╣");
+
+            // --- PLAYERS (TOP 10 ONLY) ---
             int rank = 1;
+            bool hasPlayers = false;
+
             for (int i = 0; i < leaderboard.Length; i++)
             {
-                if (leaderboard[i] != "")
+                if (!string.IsNullOrWhiteSpace(leaderboard[i]))
                 {
+                    hasPlayers = true;
                     string[] parts = leaderboard[i].Split(',');
-                    Console.WriteLine(String.Format("{0,-5}{1,-20}{2,-10}", rank, parts[0], parts[1]));
+
+                    string name = parts[0];
+                    string pts = parts.Length > 1 ? parts[1] : "0";
+
+                    // Limit letters to 26 chars so it doesn't mess up the box huhu
+                    if (name.Length > 26) name = name.Substring(0, 23) + "...";
+
+                    Console.Write(@"  ║ ");
+
+                   
+                    if (rank == 1) Console.ForegroundColor = ConsoleColor.Yellow; 
+                    else if (rank == 2) Console.ForegroundColor = ConsoleColor.Gray; 
+                    else if (rank == 3) Console.ForegroundColor = ConsoleColor.DarkRed; 
+                    else Console.ForegroundColor = ConsoleColor.White; 
+
+                   
+                    Console.Write(string.Format("{0,-6} │  {1,-26}  │  {2,-25}", $"#{rank}", name, $"{pts} PTS"));
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(@"║");
+
                     rank++;
+
+                    // Limit to Top 10 so the screen doesn't overflow
+                    if (rank > 10) break;
                 }
             }
+
+            if (!hasPlayers)
+            {
+                Console.Write(@"  ║");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("       [ NO RECORDS FOUND. BE THE FIRST TO SET A HIGH SCORE! ]       ");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"║");
+            }
+
+          
+            Console.WriteLine(@"  ╚════════╧══════════════════════════════╧═════════════════════════════╝");
             Console.WriteLine();
-            Console.WriteLine("Press any key to go back");
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("    Tap to go back   ");
+            Console.ResetColor();
+
             Console.ReadKey();
-            gamemenu(wordDictionary);
+            return; 
         }
         static void DrawHangman(int stage)
         {
@@ -284,7 +570,7 @@ namespace ConsoleApp2
             Console.WriteLine("_|_");
         }
 
-        static void HangmanMenu(string currentUser,Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static void HangmanMenu(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
 
             bool exithangmanmenu = false;
@@ -296,48 +582,85 @@ namespace ConsoleApp2
                 for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
                 {
                     Console.Clear();
-                    Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
-                    Console.WriteLine("\n=====================================");
-                    Console.WriteLine("        Hangman Game         ");
-                    Console.WriteLine("=====================================");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
 
-                    DrawHangman(wrongGuesses);
-                    Thread.Sleep(500);
-                }
-                Console.WriteLine("Choose your hangman mode:");
-                Console.WriteLine("[1] Easy");
-                Console.WriteLine("[2] Normal");
-                Console.WriteLine("[3] Hard");
-                Console.WriteLine("[0] Go Back to Main Menu");
-                Console.Write("Enter choice: ");
-                string choice = Console.ReadLine();
+                    string playerText = $"> USER: {currentUser}";
+                    string pointsText = $"> SCORE: {points} PTS";
+                    int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                    if (spaces < 0) spaces = 0;
 
-                switch (choice)
-                {
-                    case "1":
-                        Console.Clear();
-                        HangmanEasy(currentUser,wordDictionary);
-                        break;
-                    case "2":
-                        Console.Clear();
-                        HangmanNormal(currentUser, wordDictionary);
-                        break;
-                    case "3":
-                        Console.Clear();
-                        HangmanHard(currentUser, wordDictionary);
-                        break;
-                    case "0":
-                        Console.Clear();
-                        gamemenu(wordDictionary);
-                        exithangmanmenu = true;
-                        break;
-                    default:
-                        Console.WriteLine(" [Please enter a correct option.]");
-                        break;
+
+                    Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                    Console.Write(@"  ║  ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(playerText);
+                    Console.Write(new string(' ', spaces));
+                    Console.Write(pointsText);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(@"  ║");
+                    Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
+                    Console.WriteLine(@"  ║  +======+  ║                                                ║");
+                    Console.WriteLine(@"  ║  |      |  ║                                                ║");
+                    Console.WriteLine(@"  ║  O      |  ║             [ 1 ] > EASY (BEGINNER)            ║");
+                    Console.WriteLine(@"  ║ /|\     |  ║             [ 2 ] > NORMAL (OPERATIVE)         ║");
+                    Console.WriteLine(@"  ║ / \     |  ║             [ 3 ] > HARD (NIGHTMARE)           ║");
+                    Console.WriteLine(@"  ║         |  ║             [ 0 ] > RETURN                     ║");
+                    Console.WriteLine(@"  ║         |  ║                                                ║");
+                    Console.WriteLine(@"  ║ ========╩= ║      »» SELECT DIFFICULTY PROTOCOL ««          ║");
+                    Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
+                    Console.WriteLine();
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    Enter command (0-3) : ");
+                    Console.ResetColor();
+
+                    string choice = Console.ReadLine();
+
+
+                    switch (choice)
+                    {
+                        case "1":
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\n    Loading Easy Mode...");
+                            System.Threading.Thread.Sleep(600);
+                            points = HangmanEasy(currentUser, points, wordDictionary);
+                            break;
+
+                        case "2":
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\n    Loading Normal Mode...");
+                            System.Threading.Thread.Sleep(600);
+                            points = HangmanNormal(currentUser, points, wordDictionary);
+                            break;
+
+                        case "3":
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Red; 
+                            Console.WriteLine("\n    Loading Hard Mode...");
+                            System.Threading.Thread.Sleep(800);
+                            points = HangmanHard(currentUser, points, wordDictionary);
+                            break;
+
+                        case "0":
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Magenta;
+                            Console.WriteLine("\n    Returning...");
+                            System.Threading.Thread.Sleep(800);
+
+                      
+                            return;
+
+                        default:
+                     
+                            WarningPopup("INVALID OPTION", "Please enter 0, 1, 2, or 3.");
+                            break;
+                    }
                 }
             }
         }
-        static void LoadingScreen()
+            static void LoadingScreen()
         {
             for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
             {
@@ -393,52 +716,149 @@ namespace ConsoleApp2
 
             return (randomEntry.Key, randomEntry.Value.definition);
         }
-        static void HangmanEasy(string currentUser, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static int HangmanEasy(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
-            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            var (hangmanwordOrig, hangmandefinition) = WordRandomizer(wordDictionary);
+            string hangmanword = hangmanwordOrig.ToLower();
+
             List<char> CorrectLetters = new List<char>();
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
+            string errorMessage = "";
 
             LoadingScreen();
 
             while (playing)
             {
                 Console.Clear();
-                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
-                Console.WriteLine("\n=====================================");
-                Console.WriteLine("        HANGMAN EASY MODE       ");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("> Are you ready to play?");
-                Console.WriteLine("> Guess the filipino word in the blanks below!");
+                string playerText = $"> USER: {currentUser}";
+                string pointsText = $"> SCORE: {points} PTS";
+                int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                if (spaces < 0) spaces = 0;
+
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.Write(@"  ║  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(playerText);
+                Console.Write(new string(' ', spaces));
+                Console.Write(pointsText);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ║");
+                Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║                    [ DIFFICULTY: EASY ]                     ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- 2. HANGMAN STAGE ---
                 DrawHangman(wrongGuesses);
                 Console.WriteLine();
+
+                // --- 3. THE PUZZLE WORD ---
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("    [ W O R D ]");
+                Console.Write("      ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                bool won = true;
                 foreach (char c in hangmanword)
                 {
                     if (CorrectLetters.Contains(c))
                     {
-                        Console.Write(c);
+                        Console.Write(char.ToUpper(c) + " "); // Prints revealed letters in UPPERCASE
                     }
                     else
                     {
-                        Console.Write("_");
+                        Console.Write("_ "); // Prints blanks
+                        won = false; // If we hit a blank, they haven't won yet
                     }
                 }
+                Console.WriteLine("\n");
 
-                Console.WriteLine("\n\nMeaning: " + hangmandefinition);
+                // --- 4. CLUE / INTEL ---
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("    [ H I N T  ( M E A N I N G ) ]");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                // Basic word wrap trick to keep the definition looking clean
+                Console.WriteLine("      " + hangmandefinition);
+                Console.WriteLine();
 
-                if (WrongLetters != null)
+                // --- 5. COMPROMISED DATA (WRONG GUESSES) ---
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("    [ W R O N G   L E T T E R S ]");
+                Console.Write("      ");
+                if (WrongLetters.Count == 0)
                 {
-                    Console.Write("Wrong guesses: ");
+                    Console.WriteLine("None");
+                }
+                else
+                {
                     foreach (char w in WrongLetters)
                     {
-                        Console.Write(w);
+                        Console.Write(char.ToUpper(w) + "  ");
                     }
+                    Console.WriteLine();
                 }
 
-                Console.Write("\nGuess a letter: ");
-                string input = Console.ReadLine().ToLower();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+
+                // --- 6. WIN / LOSS LOGIC ---
+                if (won)
+                {
+                    points += 5;
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"        \ \    / /_ _|  __|_   _|__  _ \ \ \ / / ");
+                    Console.WriteLine(@"         \ \  / / | || |    | | / _ \ |_) \ V /  ");
+                    Console.WriteLine(@"          \ \/ /  | || |__  | || (_) |  _ <| |   ");
+                    Console.WriteLine(@"           \__/  |___|\____| |_| \___/|_| \_\_|  ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION ACCOMPLISHED! THE WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n                  REWARD: [ + 5 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
+                    Console.ReadKey();
+                    return points;
+                }
+
+                if (wrongGuesses >= 6)
+                {
+                    points -= 2;
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"           ___   _   __  __ ___    _____   _____ ___  ");
+                    Console.WriteLine(@"          / __| /_\ |  \/  | __|  / _ \ \ / / __| _ \ ");
+                    Console.WriteLine(@"         | (_ |/ _ \| |\/| | _|  | (_) \ V /| _||   / ");
+                    Console.WriteLine(@"          \___/_/ \_\_|  |_|___|  \___/ \_/ |___|_|_\ ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION FAILED. THE TARGET WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n                  PENALTY: [ - 2 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
+                    Console.ReadKey();
+                    return points;
+                }
+
+                // --- 7. ERROR MESSAGE DISPLAY ---
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"    [!] {errorMessage}");
+                    errorMessage = ""; // Reset after displaying
+                }
+
+                // --- 8. INPUT PROMPT ---
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("    > ENTER A LETTER : ");
+                Console.ResetColor();
+                string input = Console.ReadLine()?.ToLower();
 
                 if (input.Length != 1) //it needs to be char
                 {
@@ -464,7 +884,7 @@ namespace ConsoleApp2
 
 
                 // Check win
-                bool won = true;
+           
                 foreach (char c in hangmanword)
                 {
                     if (!CorrectLetters.Contains(c))
@@ -479,254 +899,483 @@ namespace ConsoleApp2
                     Console.WriteLine("\nYou Win! + 5 Points!");
                     Console.WriteLine("The word was: " + hangmanword);
                     points += 5;
-                    calcu();
                     playing = false;
                     Console.WriteLine("Press any key to go back to hangman menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
                 }
 
                 if (wrongGuesses >= 6)
                 {
                     Console.WriteLine("\nYou Lose! - 2 Points.");
                     Console.WriteLine("The word was: " + hangmanword);
-                    calcu();
                     points -= 2;
                     playing = false;
                     Console.WriteLine("Press any key to go back to hangman menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
                 }
             }
-            return;
+            return points;
         }
 
 
-        static void HangmanNormal(string currentUser, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static int HangmanNormal(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
-            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            var (hangmanwordOrig, hangmandefinition) = WordRandomizer(wordDictionary);
+            string hangmanword = hangmanwordOrig.ToLower();
+
             List<char> CorrectLetters = new List<char>();
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
+            string errorMessage = "";
+
+            // Normal mode specific mechanics
             bool definitionAsked = false;
             bool definitionUnlocked = false;
-            LoadingScreen();
+
+            // Themed loading effect
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n\n    [ SYSTEM ] Generating Level 2 Intelligence...");
+            System.Threading.Thread.Sleep(1000);
+
             while (playing)
             {
-
                 Console.Clear();
-                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
-                Console.WriteLine("\n=====================================");
-                Console.WriteLine("        HANGMAN NORMAL MODE       ");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("> Are you ready to play?");
-                Console.WriteLine("> Guess the filipino word in the blanks below!");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                // --- 1. HUD (HEADS UP DISPLAY) ---
+                string playerText = $"> USER: {currentUser}";
+                string pointsText = $"> SCORE: {points} PTS";
+                int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                if (spaces < 0) spaces = 0;
+
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.Write(@"  ║  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(playerText);
+                Console.Write(new string(' ', spaces));
+                Console.Write(pointsText);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ║");
+                Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║                   [ DIFFICULTY: NORMAL ]                    ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- 2. HANGMAN STAGE ---
                 DrawHangman(wrongGuesses);
+                Console.WriteLine();
+
+                // --- 3. THE PUZZLE WORD ---
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("    [ T A R G E T   W O R D ]");
+                Console.Write("      ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                bool won = true;
                 foreach (char c in hangmanword)
                 {
                     if (CorrectLetters.Contains(c))
                     {
-                        Console.Write(c);
+                        Console.Write(char.ToUpper(c) + " ");
                     }
                     else
                     {
-                        Console.Write("_");
+                        Console.Write("_ ");
+                        won = false;
                     }
                 }
+                Console.WriteLine("\n");
+
+                // --- 4. CLUE / INTEL (NORMAL MECHANIC) ---
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("    [ H I N T   ( M E A N I N G ) ]");
 
                 if (!definitionAsked)
                 {
-                    Console.WriteLine("\nDo you want to unlock the definition? Doing this action will result in building your stickman by 1. Y/N");
-                    string unlock = Console.ReadLine().ToUpper();
-
-                    if (unlock == "Y")
-                    {
-                        Console.WriteLine("\nMeaning: " + hangmandefinition);
-                        wrongGuesses++;
-                        definitionUnlocked = true;
-                    }
-
-                    definitionAsked = true;
-                    continue;
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine("      [ AWAITING DEFINITION TO BE UNLOCKED ]");
                 }
-
-                if (definitionUnlocked)
+                else if (definitionUnlocked)
                 {
-                    Console.WriteLine("\nMeaning: " + hangmandefinition);
-                }
-
-
-
-                if (WrongLetters != null)
-                {
-                    Console.Write("\n\nWrong guesses: ");
-                    foreach (char w in WrongLetters)
-                    {
-                        Console.Write(w);
-                    }
-                }
-
-                Console.Write("\nGuess a letter: ");
-                string input = Console.ReadLine().ToLower();
-
-                if (input.Length != 1) //it needs to be char
-                {
-                    continue;
-                }
-
-                char letter = input[0];
-
-                if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
-                {
-                    continue;
-                }
-
-                if (hangmanword.Contains(letter))
-                {
-                    CorrectLetters.Add(letter);
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("      " + hangmandefinition); // Shows the clue
                 }
                 else
                 {
-                    WrongLetters.Add(letter);
-                    wrongGuesses++;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("      [ HINT DECLINED. PLAYING BLIND. ]");
                 }
-                // Check win
-                bool won = true;
-                foreach (char c in hangmanword)
+                Console.WriteLine();
+
+                // --- 5. COMPROMISED DATA (WRONG GUESSES) ---
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("    [ W R O N G   L E T T E R S ]");
+                Console.Write("      ");
+                if (WrongLetters.Count == 0)
                 {
-                    if (!CorrectLetters.Contains(c))
-                    {
-                        won = false;
-                        break;
-                    }
+                    Console.WriteLine("None");
                 }
+                else
+                {
+                    foreach (char w in WrongLetters)
+                    {
+                        Console.Write(char.ToUpper(w) + "  ");
+                    }
+                    Console.WriteLine();
+                }
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+
+                // --- 6. WIN / LOSS LOGIC (NORMAL REWARDS) ---
                 if (won)
                 {
-                    Console.WriteLine("\nYou Win!");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points += 10;
-                    playing = false;
-                    calcu();
-                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    points += 10; // Normal Mode Reward!
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"        \ \    / /_ _|  __|_   _|__  _ \ \ \ / / ");
+                    Console.WriteLine(@"         \ \  / / | || |    | | / _ \ |_) \ V /  ");
+                    Console.WriteLine(@"          \ \/ /  | || |__  | || (_) |  _ <| |   ");
+                    Console.WriteLine(@"           \__/  |___|\____| |_| \___/|_| \_\_|  ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION ACCOMPLISHED! THE WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n                  REWARD: [ + 10 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Tap to return to the Hangman Menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
                 }
+
                 if (wrongGuesses >= 6)
                 {
-                    Console.WriteLine("\nYou Lose!");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points -= 5;
-                    playing = false;
-                    calcu();
-                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    points -= 5; // Normal Mode Penalty!
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"           ___   _   __  __ ___    _____   _____ ___  ");
+                    Console.WriteLine(@"          / __| /_\ |  \/  | __|  / _ \ \ / / __| _ \ ");
+                    Console.WriteLine(@"         | (_ |/ _ \| |\/| | _|  | (_) \ V /| _||   / ");
+                    Console.WriteLine(@"          \___/_/ \_\_|  |_|___|  \___/ \_/ |___|_|_\ ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION FAILED. THE TARGET WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n                  PENALTY: [ - 5 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Tap to return to the Hangman Menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
+                }
+
+                // --- 7. ERROR MESSAGE DISPLAY ---
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"    [!] {errorMessage}");
+                    errorMessage = "";
+                }
+
+                // --- 8. DYNAMIC INPUT PROMPT (DECRYPT VS GUESS) ---
+                if (!definitionAsked)
+                {
+                    // Decryption choice prompt
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("    [!] WARNING: GETTING HINT ADDS +1 TO HANGMAN STAGE.");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    > UNLOCK HINT? (Y/N) : ");
+                    Console.ResetColor();
+
+                    string unlock = Console.ReadLine()?.ToUpper();
+
+                    if (unlock == "Y")
+                    {
+                        wrongGuesses++;
+                        definitionUnlocked = true;
+                        definitionAsked = true;
+                    }
+                    else if (unlock == "N")
+                    {
+                        definitionAsked = true;
+                    }
+                    else
+                    {
+                        errorMessage = "Invalid command. Enter 'Y' for Yes or 'N' for No.";
+                    }
+                    continue; // Refresh screen after making the choice!
+                }
+                else
+                {
+                    // Standard letter guessing prompt
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    > ENTER A LETTER : ");
+                    Console.ResetColor();
+                    string input = Console.ReadLine()?.ToLower();
+
+                    // --- 9. INPUT VALIDATION ---
+                    if (string.IsNullOrWhiteSpace(input) || input.Length != 1 || !char.IsLetter(input[0]))
+                    {
+                        errorMessage = "Invalid target. Please enter a single letter.";
+                        continue;
+                    }
+
+                    char letter = input[0];
+
+                    if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter))
+                    {
+                        errorMessage = $"Letter '{char.ToUpper(letter)}' has already been used!";
+                        continue;
+                    }
+
+                    // --- 10. GAMEPLAY LOGIC ---
+                    if (hangmanword.Contains(letter))
+                    {
+                        CorrectLetters.Add(letter);
+                    }
+                    else
+                    {
+                        WrongLetters.Add(letter);
+                        wrongGuesses++;
+                    }
                 }
             }
-            return;
+
+            return points;
         }
-        static void HangmanHard(string currentUser, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static int HangmanHard(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+
         {
-            var (hangmanword, hangmandefinition) = WordRandomizer(wordDictionary);
+            var (hangmanwordOrig, hangmandefinition) = WordRandomizer(wordDictionary);
+            string hangmanword = hangmanwordOrig.ToLower();
+
             List<char> CorrectLetters = new List<char>();
             List<char> WrongLetters = new List<char>();
             int wrongGuesses = 0;
             bool playing = true;
-            LoadingScreen();
+            string errorMessage = "";
+
+            // Normal mode specific mechanics
+            bool definitionAsked = false;
+            bool definitionUnlocked = false;
+
+            // Themed loading effect
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n\n    [ SYSTEM ] Generating Level 2 Intelligence...");
+            System.Threading.Thread.Sleep(1000);
+
             while (playing)
             {
                 Console.Clear();
-                Console.Write("Playing as: " + currentUser); Console.Write("        Points: " + points);
-                Console.WriteLine("\n=====================================");
-                Console.WriteLine("        HANGMAN HARD MODE       ");
-                Console.WriteLine("=====================================");
-                Console.WriteLine("> Are you ready to play?");
-                Console.WriteLine("> Guess the filipino word in the blanks below!");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                // --- 1. HUD (HEADS UP DISPLAY) ---
+                string playerText = $"> AGENT: {currentUser}";
+                string pointsText = $"> SCORE: {points} PTS";
+                int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                if (spaces < 0) spaces = 0;
+
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.Write(@"  ║  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(playerText);
+                Console.Write(new string(' ', spaces));
+                Console.Write(pointsText);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ║");
+                Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║                   [ DIFFICULTY: NORMAL ]                    ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
+                Console.WriteLine();
+
+                // --- 2. HANGMAN STAGE ---
                 DrawHangman(wrongGuesses);
+                Console.WriteLine();
+
+                // --- 3. THE PUZZLE WORD ---
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("    [ T A R G E T   W O R D ]");
+                Console.Write("      ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+
+                bool won = true;
                 foreach (char c in hangmanword)
                 {
                     if (CorrectLetters.Contains(c))
                     {
-                        Console.Write(c);
+                        Console.Write(char.ToUpper(c) + " ");
                     }
                     else
                     {
-                        Console.Write("_");
+                        Console.Write("_ ");
+                        won = false;
                     }
                 }
+                Console.WriteLine("\n");
 
-                if (WrongLetters != null)
+                // --- 4. CLUE / INTEL (NORMAL MECHANIC) ---
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("    [ H I N T   ( M E A N I N G ) ]");
+
+                if (!definitionAsked)
                 {
-                    Console.Write("\nWrong guesses: ");
-                    foreach (char w in WrongLetters)
-                    {
-                        Console.Write(w);
-                    }
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.WriteLine("      [ AWAITING DEFINITION TO BE UNLOCKED ]");
                 }
-                Console.WriteLine();
-                Console.Write("\nGuess a letter: ");
-                string input = Console.ReadLine().ToLower();
-
-                if (input.Length != 1) //it needs to be char
+                else if (definitionUnlocked)
                 {
-                    continue;
-                }
-
-                char letter = input[0];
-
-                if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter)) //it needs to be not on the list
-                {
-                    continue;
-                }
-
-                if (hangmanword.Contains(letter))
-                {
-                    CorrectLetters.Add(letter);
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("      " + hangmandefinition); // Shows the clue
                 }
                 else
                 {
-                    WrongLetters.Add(letter);
-                    wrongGuesses++;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("      [ H I N T DECLINED. PLAYING BLIND. ]");
                 }
+                Console.WriteLine();
 
-
-                // Check win
-                bool won = true;
-                foreach (char c in hangmanword)
+                // --- 5. COMPROMISED DATA (WRONG GUESSES) ---
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("    [ W R O N G   L E T T E R S ]");
+                Console.Write("      ");
+                if (WrongLetters.Count == 0)
                 {
-                    if (!CorrectLetters.Contains(c))
+                    Console.WriteLine("None");
+                }
+                else
+                {
+                    foreach (char w in WrongLetters)
                     {
-                        won = false;
-                        break;
+                        Console.Write(char.ToUpper(w) + "  ");
                     }
+                    Console.WriteLine();
                 }
 
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+
+                // --- 6. WIN / LOSS LOGIC (NORMAL REWARDS) ---
                 if (won)
                 {
-                    Console.WriteLine("\nYou Win!");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points += 20;
-                    playing = false;
-                    calcu();
-                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    points += 10; // Normal Mode Reward!
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"        \ \    / /_ _|  __|_   _|__  _ \ \ \ / / ");
+                    Console.WriteLine(@"         \ \  / / | || |    | | / _ \ |_) \ V /  ");
+                    Console.WriteLine(@"          \ \/ /  | || |__  | || (_) |  _ <| |   ");
+                    Console.WriteLine(@"           \__/  |___|\____| |_| \___/|_| \_\_|  ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION ACCOMPLISHED! THE WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("\n                  REWARD: [ + 10 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
                 }
 
                 if (wrongGuesses >= 6)
                 {
-                    Console.WriteLine("\nYou Lose!");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points -= 8;
-                    playing = false;
-                    calcu();
-                    Console.WriteLine("Press any key to go back to hangman menu...");
+                    points -= 5; // Normal Mode Penalty!
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"           ___   _   __  __ ___    _____   _____ ___  ");
+                    Console.WriteLine(@"          / __| /_\ |  \/  | __|  / _ \ \ / / __| _ \ ");
+                    Console.WriteLine(@"         | (_ |/ _ \| |\/| | _|  | (_) \ V /| _||   / ");
+                    Console.WriteLine(@"          \___/_/ \_\_|  |_|___|  \___/ \_/ |___|_|_\ ");
+                    Console.WriteLine("\n  ═══════════════════════════════════════════════════════════════");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\n          MISSION FAILED. THE TARGET WORD WAS: {hangmanwordOrig.ToUpper()}");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\n                  PENALTY: [ - 5 POINTS ]");
+                    Console.ResetColor();
+                    Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
-                    return;
+                    return points;
+                }
+
+                // --- 7. ERROR MESSAGE DISPLAY ---
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"    [!] {errorMessage}");
+                    errorMessage = "";
+                }
+
+                // --- 8. DYNAMIC INPUT PROMPT (DECRYPT VS GUESS) ---
+                if (!definitionAsked)
+                {
+                    // Decryption choice prompt
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("    [!] WARNING: UNLOCKING HINT ADDS +1 TO HANGMAN STAGE.");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    > UNLOCK HINT? (Y/N) : ");
+                    Console.ResetColor();
+
+                    string unlock = Console.ReadLine()?.ToUpper();
+
+                    if (unlock == "Y")
+                    {
+                        wrongGuesses++;
+                        definitionUnlocked = true;
+                        definitionAsked = true;
+                    }
+                    else if (unlock == "N")
+                    {
+                        definitionAsked = true;
+                    }
+                    else
+                    {
+                        errorMessage = "Invalid command. Enter 'Y' for Yes or 'N' for No.";
+                    }
+                    continue; // Refresh screen after making the choice!
+                }
+                else
+                {
+                    // Standard letter guessing prompt
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    ▶ ENTER A LETTER : ");
+                    Console.ResetColor();
+                    string input = Console.ReadLine()?.ToLower();
+
+                    // --- 9. INPUT VALIDATION ---
+                    if (string.IsNullOrWhiteSpace(input) || input.Length != 1 || !char.IsLetter(input[0]))
+                    {
+                        errorMessage = "Invalid target. Please enter a single letter.";
+                        continue;
+                    }
+
+                    char letter = input[0];
+
+                    if (CorrectLetters.Contains(letter) || WrongLetters.Contains(letter))
+                    {
+                        errorMessage = $"Letter '{char.ToUpper(letter)}' has already been used!";
+                        continue;
+                    }
+
+                    // --- 10. GAMEPLAY LOGIC ---
+                    if (hangmanword.Contains(letter))
+                    {
+                        CorrectLetters.Add(letter);
+                    }
+                    else
+                    {
+                        WrongLetters.Add(letter);
+                        wrongGuesses++;
+                    }
                 }
             }
-            return;
+
+            return points;
         }
         static void Readingcomp()
         {
@@ -734,42 +1383,74 @@ namespace ConsoleApp2
             bool try4 = false;
             while (!try4)
             {
-                Console.WriteLine("==============Reading comprehension===========");
-                Console.WriteLine("Choose your Level of Difficulty");
-                Console.WriteLine("[1]. Easy Level");
-                Console.WriteLine("[2]. Medium Level");
-                Console.WriteLine("[3]. Hard Level");
-                Console.WriteLine("[4]. Exit");
-                Console.WriteLine("===============================================");
-                Console.Write("Enter your choice: ");
-                string choice = Console.ReadLine().ToUpper();
-                switch (choice)
-                {
-                    case "1":
-                        easy();
-                        try4 = true;
-                        break;
-                    case "2":
-                        medium();
-                        try4 = true;
-                        break;
-                    case "3":
-                        hard();
-                        try4 = true;
-                        break;
-                    case "4":
-                        try4 = true;
-                        break;
-                    default:
-                        Console.Clear();
-                        Console.WriteLine("Invalid Option pls enter either 1, 2, 3 or 4");
-                        try4 = false;
-                        break;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+
+                
+                        Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                        Console.WriteLine(@"  ║                 [ READING COMPREHENSION ]                   ║");
+                        Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
+                        Console.WriteLine(@"  ║  .------.  ║                                                ║");
+                        Console.WriteLine(@"  ║  |      |  ║        CHOOSE YOUR LEVEL OF DIFFICULTY         ║");
+                        Console.WriteLine(@"  ║  |______|  ║                                                ║");
+                        Console.WriteLine(@"  ║   _||||_   ║        [ 1 ] . EASY LEVEL                      ║");
+                        Console.WriteLine(@"  ║  |______|  ║        [ 2 ] . MEDIUM LEVEL                    ║");
+                        Console.WriteLine(@"  ║            ║        [ 3 ] . HARD LEVEL                      ║");
+                        Console.WriteLine(@"  ║            ║        [ 4 ] . EXIT                            ║");
+                        Console.WriteLine(@"  ║  ========  ║                                                ║");
+                        Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
+                        Console.WriteLine();
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("    Enter your choice (1-4) : ");
+                        Console.ResetColor();
+
+                        string choice = Console.ReadLine()?.ToUpper();
+
+                        switch (choice)
+                        {
+                            case "1":
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("\n    Loading Easy Level...");
+                                System.Threading.Thread.Sleep(600);
+                                easy();
+                                try4 = true;
+                                break;
+                            case "2":
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine("\n    Loading Medium Level...");
+                                System.Threading.Thread.Sleep(600);
+                                medium();
+                                try4 = true;
+                                break;
+                            case "3":
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("\n    Loading Hard Level...");
+                                System.Threading.Thread.Sleep(800);
+                                hard();
+                                try4 = true;
+                                break;
+                            case "4":
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                                Console.WriteLine("\n    Exiting Reading Comprehension...");
+                                System.Threading.Thread.Sleep(500);
+                                try4 = true;
+                                break;
+                            default:
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
+                                Console.ResetColor();
+                                System.Threading.Thread.Sleep(1500); 
+                                try4 = false;
+                                break;
+                        }
+                    }
                 }
-            }
-        }
-        // It returns a List of stories, where each story has a Title, Text, and List of Questions
-        static List<(string Title, string Text, List<(string Prompt, string[] Choices, char Answer)> Questions)>
+                // It returns a List of stories, where each story has a Title, Text, and List of Questions
+                static List<(string Title, string Text, List<(string Prompt, string[] Choices, char Answer)> Questions)>
             LoadStories(string filePath) // is basically our easy, normal and hard txt file so whatever filename we pass we call either easy, normal or hard
         {
             // create an empty list that holds the story
@@ -875,9 +1556,35 @@ namespace ConsoleApp2
             return stories;
         }
         //  DISPLAY 
+        static List<string> WordWrap(string text, int maxLineLength)
+        {
+            var list = new List<string>();
+            string[] paragraphs = text.Split(new[] { "\n" }, StringSplitOptions.None);
+            foreach (string paragraph in paragraphs)
+            {
+                if (string.IsNullOrWhiteSpace(paragraph))
+                {
+                    list.Add("");
+                    continue;
+                }
+                string[] words = paragraph.Split(' ');
+                string currentLine = "";
+                foreach (string word in words)
+                {
+                    if ((currentLine + word).Length > maxLineLength)
+                    {
+                        list.Add(currentLine.TrimEnd());
+                        currentLine = "";
+                    }
+                    currentLine += word + " ";
+                }
+                if (currentLine.Length > 0)
+                    list.Add(currentLine.TrimEnd());
+            }
+            return list;
+        }
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
-
             bool goBackToStory = false;
 
             do
@@ -888,33 +1595,88 @@ namespace ConsoleApp2
                 foreach (var q in questions)
                 {
                     Console.Clear();
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("╔════════════════════════════════════════════════════════╗");
-                    Console.WriteLine("║           " + title.PadRight(45) + "║");
-                    Console.WriteLine("╚════════════════════════════════════════════════════════╝");
-                    Console.ResetColor();
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n" + text + "\n");
-                    Console.ResetColor();
-                    Console.WriteLine("--------------------------------------------");
-                    // Question below the story
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("\n" + q.Prompt);
-                    Console.ResetColor();
+
+                    // --- 1. HUD & HEADER ---
+                    string playerText = $"> USER: {currentUser}";
+                    string pointsText = $"> SCORE: {points} PTS";
+                    int spaces = 61 - 4 - playerText.Length - pointsText.Length;
+                    if (spaces < 0) spaces = 0;
+
+                    Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                    Console.Write(@"  ║  ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(playerText);
+                    Console.Write(new string(' ', spaces));
+                    Console.Write(pointsText);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(@"  ║");
+                    Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
+                    Console.WriteLine(@"  ║                  [ READING COMPREHENSION ]                  ║");
+                    Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
+                    Console.WriteLine();
+
+                    // --- 2. TITLE DIVIDER ---
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine($"    [ THE STORY : {title.ToUpper()} ]");
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
+                    Console.WriteLine();
+
+                    // --- 3. STORY TEXT (Highly Readable, No Side Borders) ---
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    List<string> wrappedStory = WordWrap(text, 60);
+                    foreach (string line in wrappedStory)
+                    {
+                        Console.WriteLine("    " + line); // Indented cleanly
+                    }
+                    Console.WriteLine();
+
+                    // --- 4. QUESTION SEPARATOR ---
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(@"  [ QUESTION ]");
+                    Console.WriteLine();
+
+                    // --- 5. WRAPPED QUESTION ---
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    List<string> wrappedQuestion = WordWrap($"Q: {q.Prompt}", 60);
+                    foreach (var line in wrappedQuestion)
+                    {
+                        Console.WriteLine("    " + line);
+                    }
+                    Console.WriteLine();
+
+                    // --- 6. CHOICES ---
+                    Console.ForegroundColor = ConsoleColor.White;
                     foreach (var choice in q.Choices)
-                        Console.WriteLine(choice);
-                    Console.Write("\nYour answer: ");
-                    string input = Console.ReadLine().Trim().ToUpper();
-                    if (input == "BACK")
+                    {
+                        Console.WriteLine("      " + choice);
+                    }
+                    Console.WriteLine();
+
+                    // --- 7. INPUT PROMPT ---
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
+                    Console.WriteLine("    [ Type 'x' to exit ]");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("    > ENTER YOUR ANSWER (A/B/C/D) : ");
+                    Console.ResetColor();
+
+                    string input = Console.ReadLine()?.Trim().ToUpper();
+
+                    if (input == "x")
                     {
                         goBackToStory = true;
                         break;
                     }
+
+                    // --- 8. FEEDBACK ---
                     if (input.Length > 0 && input[0] == q.Answer)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Correct!");
+                        Console.WriteLine($"\n    [✓] CORRECT! The answer is {q.Answer}. (+{pointsIfPass} PTS)");
                         Console.ResetColor();
                         points += pointsIfPass;
                         score++;
@@ -923,20 +1685,53 @@ namespace ConsoleApp2
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         points -= pointsifNot;
-                        Console.WriteLine($"Wrong! The correct answer is {q.Answer}.");
+                        Console.WriteLine($"\n    [X] INCORRECT! The correct answer was {q.Answer}. (-{pointsifNot} PTS)");
                         Console.ResetColor();
                     }
+
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("\n    Press any key to continue...");
                     Console.ReadKey();
                 }
+
+                // --- 9. EVALUATION & RESULTS SCREEN ---
                 if (!goBackToStory)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"\nYou got {score}/{questions.Count} correct!");
-                    Console.WriteLine("Total Points: " + points);
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine("\n\n");
+                    Console.WriteLine(@"        ╔════════════════════════════════════════════════╗");
+                    Console.WriteLine(@"        ║           [O V E R A L L  R E S U L T ]        ║");
+                    Console.WriteLine(@"        ╠════════════════════════════════════════════════╣");
+                    Console.ForegroundColor = ConsoleColor.White;
+
+                    Console.WriteLine($"        ║ STORY TITLE    : {title.PadRight(31)} ║");
+                    Console.WriteLine($"        ║ SCORE   : {score} / {questions.Count} Correct                 ║");
+                    Console.WriteLine($"        ║ TOTAL POINTS : {points.ToString().PadRight(4)} PTS                       ║");
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine(@"        ╚════════════════════════════════════════════════╝");
+
+                    if (score == questions.Count)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("\n                  STATUS: EXCELLENT");
+                    }
+                    else if (score > 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n                  STATUS: GOOD JOB");
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n                  STATUS: FAILED");
+                    }
+
                     Console.ResetColor();
-                    calcu();
-                    gamemenu(wordDictionary);
+                    calcu(); 
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.ReadKey();
                     break;
                 }
 
@@ -944,23 +1739,150 @@ namespace ConsoleApp2
         }
         static void DictionaryView(Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
-            int amt = 0;
-            Console.WriteLine("\n=====================================");
-            Console.WriteLine("        Dictionary        ");
-            Console.WriteLine("=====================================");
 
-            foreach (var entry in wordDictionary.OrderBy(x => x.Key))
+            // Convert dictionary to a sorted list for pagination
+            var sortedEntries = wordDictionary.OrderBy(x => x.Key).ToList();
+
+            if (sortedEntries.Count == 0)
             {
-                Console.WriteLine("\nWord: " + entry.Key);
-                Console.WriteLine("Type: " + entry.Value.type);
-                Console.WriteLine("Definition: " + entry.Value.definition);
-                Console.WriteLine("Example: " + entry.Value.example);
-                Console.WriteLine("-------------------------------------");
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n\n    [!] DATABASE: No words found.");
+                Console.ResetColor();
+                System.Threading.Thread.Sleep(2000);
+                return;
             }
 
-            Console.WriteLine("\nPress any key to go back to main menu...");
-            Console.ReadKey();
+            int itemsPerPage = 3; // Number of words to display per screen
+            int totalPages = (int)Math.Ceiling((double)sortedEntries.Count / itemsPerPage);
+            int currentPage = 1;
+            bool viewing = true;
+
+            int amt = 0;
+            while (viewing)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+
+                // --- 1. ASCII ART HEADER ---
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║   ___ ___ ___ _____ ___ ___  _  _   _   _____   __          ║");
+                Console.WriteLine(@"  ║  |   \_ _/ __|_   _|_ _/ _ \| \| | /_\ | _ \ \ / /          ║");
+                Console.WriteLine(@"  ║  | |) | | (__  | |  | | (_) | .` |/ _ \|   /\ V /           ║");
+                Console.WriteLine(@"  ║  |___/___\___| |_| |___\___/|_|\_/_/ \_\_|_\ |_|            ║");
+                Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
+
+                string dbHeader = $"[ WORDS DATABASE ]";
+                string entryCount = $"{sortedEntries.Count} RECORDS";
+                int padding = 61 - 4 - dbHeader.Length - entryCount.Length;
+
+                Console.Write(@"  ║  ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(dbHeader);
+                Console.Write(new string(' ', Math.Max(0, padding)));
+                Console.Write(entryCount);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ║");
+                Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
+                Console.WriteLine();
+                // --- 2. GET CURRENT PAGE ITEMS ---
+                var pageItems = sortedEntries.Skip((currentPage - 1) * itemsPerPage).Take(itemsPerPage).ToList();
+
+                // --- 3. PRINT ITEMS ---
+                foreach (var entry in pageItems)
+                {
+                    // WORD AND TYPE
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"    > WORD: ");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(entry.Key.ToUpper());
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine($"  [{entry.Value.type.ToUpper()}]");
+
+                    // DEFINITION
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write($"     > DEF : ");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    List<string> wrappedDef = WordWrap(entry.Value.definition, 50);
+                    for (int i = 0; i < wrappedDef.Count; i++)
+                    {
+                        if (i == 0) Console.WriteLine(wrappedDef[i]);
+                        else Console.WriteLine($"            {wrappedDef[i]}");
+                    }
+
+                    // EXAMPLE
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write($"      EX  : ");
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    List<string> wrappedEx = WordWrap($"\"{entry.Value.example}\"", 50);
+                    for (int i = 0; i < wrappedEx.Count; i++)
+                    {
+                        if (i == 0) Console.WriteLine(wrappedEx[i]);
+                        else Console.WriteLine($"            {wrappedEx[i]}");
+                    }
+
+                    // DIVIDER
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
+                }
+
+                // --- 4. PAGINATION FOOTER ---
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"  [ PAGE {currentPage} OF {totalPages} ]");
+
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("    [N] Next Page  |  [P] Prev Page  |  [Q] Quit / Return");
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("\n    > COMMAND : ");
+                Console.ResetColor();
+
+                // --- 5. INPUT HANDLING ---
+                string input = Console.ReadLine()?.Trim().ToUpper();
+
+                switch (input)
+                {
+                    case "N":
+                    case "NEXT":
+                        if (currentPage < totalPages) currentPage++;
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("    [!] End of database reached.");
+                            System.Threading.Thread.Sleep(800);
+                        }
+                        break;
+                    case "P":
+                    case "PREV":
+                    case "PREVIOUS":
+                        if (currentPage > 1) currentPage--;
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("    [!] Already at the beginning of the database.");
+                            System.Threading.Thread.Sleep(800);
+                        }
+                        break;
+                    case "Q":
+                    case "QUIT":
+                    case "BACK":
+                    case "EXIT":
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine("    Exiting...");
+                        System.Threading.Thread.Sleep(500);
+                        viewing = false; // Exits the loop
+                        break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("    [!] Invalid command. Use N, P, or Q.");
+                        System.Threading.Thread.Sleep(800);
+                        break;
+                }
+            }
         }
+        
         // point calculation
         static void calcu()
         {
@@ -1016,3 +1938,4 @@ namespace ConsoleApp2
         }
     }
 }
+
