@@ -20,6 +20,7 @@ namespace ConsoleApp2
         static Random rng = new Random();
         static Dictionary<string, (string type, string definition, string example)> wordDictionary;
 
+
         static void Main(string[] args)
         {
             wordDictionary = DictionaryInput();
@@ -52,7 +53,7 @@ namespace ConsoleApp2
                 // --- INPUT PROMPT ---
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("    Enter your command (1-3) : ");
-                Console.ResetColor(); 
+                Console.ResetColor();
 
                 string output = Console.ReadLine();
 
@@ -262,6 +263,9 @@ namespace ConsoleApp2
 
             Console.ResetColor();
             Console.ReadKey();
+            Console.Clear();
+            mainmenu();
+            
         }
 
         static void regist()
@@ -383,7 +387,8 @@ namespace ConsoleApp2
                 Console.ReadKey();
 
                 regis = true; // Breaks the loop
-                return; // Safely returns to mainmenu() without causing a stack overflow
+                Console.Clear();
+                mainmenu(); // Safely returns to mainmenu() without causing a stack overflow
             }
         }
 
@@ -395,7 +400,7 @@ namespace ConsoleApp2
             {
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Cyan;
-               
+
                 string playerText = $"> USER: {currentUser}";
                 string pointsText = $"> SCORE: {points} PTS";
                 int spaces = 61 - 4 - playerText.Length - pointsText.Length;
@@ -431,7 +436,7 @@ namespace ConsoleApp2
                 switch (output2)
                 {
                     case "1":
-                        HangmanMenu(currentUser, points, wordDictionary);
+                        HangmanMenu(currentUser, wordDictionary);
                         try3 = true;
                         break;
                     case "2":
@@ -474,7 +479,7 @@ namespace ConsoleApp2
 
                     int pointsA = int.Parse(partsA[1]);
                     int pointsB = int.Parse(partsB[1]);
-                 
+
                     if (pointsA < pointsB)
                     {
                         string temp = leaderboard[j];
@@ -519,13 +524,13 @@ namespace ConsoleApp2
 
                     Console.Write(@"  ║ ");
 
-                   
-                    if (rank == 1) Console.ForegroundColor = ConsoleColor.Yellow; 
-                    else if (rank == 2) Console.ForegroundColor = ConsoleColor.Gray; 
-                    else if (rank == 3) Console.ForegroundColor = ConsoleColor.DarkRed; 
-                    else Console.ForegroundColor = ConsoleColor.White; 
 
-                   
+                    if (rank == 1) Console.ForegroundColor = ConsoleColor.Yellow;
+                    else if (rank == 2) Console.ForegroundColor = ConsoleColor.Gray;
+                    else if (rank == 3) Console.ForegroundColor = ConsoleColor.DarkRed;
+                    else Console.ForegroundColor = ConsoleColor.White;
+
+
                     Console.Write(string.Format("{0,-6} │  {1,-26}  │  {2,-25}", $"#{rank}", name, $"{pts} PTS"));
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -547,7 +552,7 @@ namespace ConsoleApp2
                 Console.WriteLine(@"║");
             }
 
-          
+
             Console.WriteLine(@"  ╚════════╧══════════════════════════════╧═════════════════════════════╝");
             Console.WriteLine();
 
@@ -556,7 +561,7 @@ namespace ConsoleApp2
             Console.ResetColor();
 
             Console.ReadKey();
-            return; 
+            return;
         }
         static void DrawHangman(int stage)
         {
@@ -570,7 +575,7 @@ namespace ConsoleApp2
             Console.WriteLine("_|_");
         }
 
-        static void HangmanMenu(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
+        static void HangmanMenu(string currentUser,Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
 
             bool exithangmanmenu = false;
@@ -604,7 +609,7 @@ namespace ConsoleApp2
                     Console.WriteLine(@"  ║  O      |  ║             [ 1 ] > EASY (BEGINNER)            ║");
                     Console.WriteLine(@"  ║ /|\     |  ║             [ 2 ] > NORMAL (OPERATIVE)         ║");
                     Console.WriteLine(@"  ║ / \     |  ║             [ 3 ] > HARD (NIGHTMARE)           ║");
-                    Console.WriteLine(@"  ║         |  ║             [ 0 ] > RETURN                     ║");
+                    Console.WriteLine(@"  ║         |  ║             [ 4 ] > RETURN                     ║");
                     Console.WriteLine(@"  ║         |  ║                                                ║");
                     Console.WriteLine(@"  ║ ========╩= ║      »» SELECT DIFFICULTY PROTOCOL ««          ║");
                     Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
@@ -624,6 +629,7 @@ namespace ConsoleApp2
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine("\n    Loading Easy Mode...");
                             System.Threading.Thread.Sleep(600);
+                            exithangmanmenu = true;
                             points = HangmanEasy(currentUser, points, wordDictionary);
                             break;
 
@@ -637,30 +643,30 @@ namespace ConsoleApp2
 
                         case "3":
                             Console.Clear();
-                            Console.ForegroundColor = ConsoleColor.Red; 
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("\n    Loading Hard Mode...");
                             System.Threading.Thread.Sleep(800);
                             points = HangmanHard(currentUser, points, wordDictionary);
                             break;
 
-                        case "0":
+                        case "4":
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Magenta;
                             Console.WriteLine("\n    Returning...");
                             System.Threading.Thread.Sleep(800);
-
-                      
+                            gamemenu(wordDictionary);
                             return;
 
                         default:
-                     
+
                             WarningPopup("INVALID OPTION", "Please enter 0, 1, 2, or 3.");
                             break;
                     }
                 }
+                gamemenu(wordDictionary);
             }
         }
-            static void LoadingScreen()
+        static void LoadingScreen()
         {
             for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
             {
@@ -884,7 +890,7 @@ namespace ConsoleApp2
 
 
                 // Check win
-           
+
                 foreach (char c in hangmanword)
                 {
                     if (!CorrectLetters.Contains(c))
@@ -937,9 +943,7 @@ namespace ConsoleApp2
 
             // Themed loading effect
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n\n    [ SYSTEM ] Generating Level 2 Intelligence...");
-            System.Threading.Thread.Sleep(1000);
+            LoadingScreen();
 
             while (playing)
             {
@@ -1166,9 +1170,7 @@ namespace ConsoleApp2
 
             // Themed loading effect
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("\n\n    [ SYSTEM ] Generating Level 2 Intelligence...");
-            System.Threading.Thread.Sleep(1000);
+            LoadingScreen();
 
             while (playing)
             {
@@ -1190,20 +1192,18 @@ namespace ConsoleApp2
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(@"  ║");
                 Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
-                Console.WriteLine(@"  ║                   [ DIFFICULTY: NORMAL ]                    ║");
+                Console.WriteLine(@"  ║                   [ DIFFICULTY: Hard ]                      ║");
                 Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
                 // --- 2. HANGMAN STAGE ---
                 DrawHangman(wrongGuesses);
                 Console.WriteLine();
-
                 // --- 3. THE PUZZLE WORD ---
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("    [ T A R G E T   W O R D ]");
                 Console.Write("      ");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-
                 bool won = true;
                 foreach (char c in hangmanword)
                 {
@@ -1217,31 +1217,9 @@ namespace ConsoleApp2
                         won = false;
                     }
                 }
-                Console.WriteLine("\n");
-
-                // --- 4. CLUE / INTEL (NORMAL MECHANIC) ---
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("    [ H I N T   ( M E A N I N G ) ]");
-
-                if (!definitionAsked)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                    Console.WriteLine("      [ AWAITING DEFINITION TO BE UNLOCKED ]");
-                }
-                else if (definitionUnlocked)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("      " + hangmandefinition); // Shows the clue
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine("      [ H I N T DECLINED. PLAYING BLIND. ]");
-                }
-                Console.WriteLine();
-
                 // --- 5. COMPROMISED DATA (WRONG GUESSES) ---
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("\n");
                 Console.WriteLine("    [ W R O N G   L E T T E R S ]");
                 Console.Write("      ");
                 if (WrongLetters.Count == 0)
@@ -1310,35 +1288,6 @@ namespace ConsoleApp2
                     Console.WriteLine($"    [!] {errorMessage}");
                     errorMessage = "";
                 }
-
-                // --- 8. DYNAMIC INPUT PROMPT (DECRYPT VS GUESS) ---
-                if (!definitionAsked)
-                {
-                    // Decryption choice prompt
-                    Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.WriteLine("    [!] WARNING: UNLOCKING HINT ADDS +1 TO HANGMAN STAGE.");
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write("    > UNLOCK HINT? (Y/N) : ");
-                    Console.ResetColor();
-
-                    string unlock = Console.ReadLine()?.ToUpper();
-
-                    if (unlock == "Y")
-                    {
-                        wrongGuesses++;
-                        definitionUnlocked = true;
-                        definitionAsked = true;
-                    }
-                    else if (unlock == "N")
-                    {
-                        definitionAsked = true;
-                    }
-                    else
-                    {
-                        errorMessage = "Invalid command. Enter 'Y' for Yes or 'N' for No.";
-                    }
-                    continue; // Refresh screen after making the choice!
-                }
                 else
                 {
                     // Standard letter guessing prompt
@@ -1383,75 +1332,73 @@ namespace ConsoleApp2
             bool try4 = false;
             while (!try4)
             {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
+                Console.WriteLine(@"  ║                 [ READING COMPREHENSION ]                   ║");
+                Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
+                Console.WriteLine(@"  ║  .------.  ║                                                ║");
+                Console.WriteLine(@"  ║  |      |  ║        CHOOSE YOUR LEVEL OF DIFFICULTY         ║");
+                Console.WriteLine(@"  ║  |______|  ║                                                ║");
+                Console.WriteLine(@"  ║   _||||_   ║        [ 1 ] . EASY LEVEL                      ║");
+                Console.WriteLine(@"  ║  |______|  ║        [ 2 ] . MEDIUM LEVEL                    ║");
+                Console.WriteLine(@"  ║            ║        [ 3 ] . HARD LEVEL                      ║");
+                Console.WriteLine(@"  ║            ║        [ 4 ] . EXIT                            ║");
+                Console.WriteLine(@"  ║  ========  ║                                                ║");
+                Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write("    Enter your choice (1-4) : ");
+                Console.ResetColor();
 
-                
-                        Console.WriteLine(@"  ╔═════════════════════════════════════════════════════════════╗");
-                        Console.WriteLine(@"  ║                 [ READING COMPREHENSION ]                   ║");
-                        Console.WriteLine(@"  ╠════════════╦════════════════════════════════════════════════╣");
-                        Console.WriteLine(@"  ║  .------.  ║                                                ║");
-                        Console.WriteLine(@"  ║  |      |  ║        CHOOSE YOUR LEVEL OF DIFFICULTY         ║");
-                        Console.WriteLine(@"  ║  |______|  ║                                                ║");
-                        Console.WriteLine(@"  ║   _||||_   ║        [ 1 ] . EASY LEVEL                      ║");
-                        Console.WriteLine(@"  ║  |______|  ║        [ 2 ] . MEDIUM LEVEL                    ║");
-                        Console.WriteLine(@"  ║            ║        [ 3 ] . HARD LEVEL                      ║");
-                        Console.WriteLine(@"  ║            ║        [ 4 ] . EXIT                            ║");
-                        Console.WriteLine(@"  ║  ========  ║                                                ║");
-                        Console.WriteLine(@"  ╚════════════╩════════════════════════════════════════════════╝");
-                        Console.WriteLine();
+                string choice = Console.ReadLine()?.ToUpper();
 
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write("    Enter your choice (1-4) : ");
+                switch (choice)
+                {
+                    case "1":
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n    Loading Easy Level...");
+                        System.Threading.Thread.Sleep(600);
+                        easy();
+                        try4 = true;
+                        break;
+                    case "2":
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n    Loading Medium Level...");
+                        System.Threading.Thread.Sleep(600);
+                        medium();
+                        try4 = true;
+                        break;
+                    case "3":
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\n    Loading Medium Level...");
+                        System.Threading.Thread.Sleep(600);
+                        hard();
+                        try4 = true;
+                        break;
+                    case "4":
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine("\n    Exiting Reading Comprehension...");
+                        System.Threading.Thread.Sleep(500);
+                        gamemenu(wordDictionary);
+                        try4 = true;
+                        break;
+                    default:
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
                         Console.ResetColor();
-
-                        string choice = Console.ReadLine()?.ToUpper();
-
-                        switch (choice)
-                        {
-                            case "1":
-                                Console.Clear();
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("\n    Loading Easy Level...");
-                                System.Threading.Thread.Sleep(600);
-                                easy();
-                                try4 = true;
-                                break;
-                            case "2":
-                                Console.Clear();
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("\n    Loading Medium Level...");
-                                System.Threading.Thread.Sleep(600);
-                                medium();
-                                try4 = true;
-                                break;
-                            case "3":
-                                Console.Clear();
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n    Loading Hard Level...");
-                                System.Threading.Thread.Sleep(800);
-                                hard();
-                                try4 = true;
-                                break;
-                            case "4":
-                                Console.ForegroundColor = ConsoleColor.DarkGray;
-                                Console.WriteLine("\n    Exiting Reading Comprehension...");
-                                System.Threading.Thread.Sleep(500);
-                                try4 = true;
-                                break;
-                            default:
-                                Console.Clear();
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
-                                Console.ResetColor();
-                                System.Threading.Thread.Sleep(1500); 
-                                try4 = false;
-                                break;
-                        }
-                    }
+                        System.Threading.Thread.Sleep(1500);
+                        try4 = false;
+                        break;
                 }
-                // It returns a List of stories, where each story has a Title, Text, and List of Questions
-                static List<(string Title, string Text, List<(string Prompt, string[] Choices, char Answer)> Questions)>
-            LoadStories(string filePath) // is basically our easy, normal and hard txt file so whatever filename we pass we call either easy, normal or hard
+            }
+        }
+        // It returns a List of stories, where each story has a Title, Text, and List of Questions
+        static List<(string Title, string Text, List<(string Prompt, string[] Choices, char Answer)> Questions)>
+    LoadStories(string filePath) // is basically our easy, normal and hard txt file so whatever filename we pass we call either easy, normal or hard
         {
             // create an empty list that holds the story
             var stories = new List<(string, string, List<(string, string[], char)>)>();
@@ -1615,15 +1562,11 @@ namespace ConsoleApp2
                     Console.WriteLine(@"  ║                  [ READING COMPREHENSION ]                  ║");
                     Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
                     Console.WriteLine();
-
-                    // --- 2. TITLE DIVIDER ---
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine($"    [ THE STORY : {title.ToUpper()} ]");
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
                     Console.WriteLine();
-
-                    // --- 3. STORY TEXT (Highly Readable, No Side Borders) ---
                     Console.ForegroundColor = ConsoleColor.Gray;
                     List<string> wrappedStory = WordWrap(text, 60);
                     foreach (string line in wrappedStory)
@@ -1631,15 +1574,11 @@ namespace ConsoleApp2
                         Console.WriteLine("    " + line); // Indented cleanly
                     }
                     Console.WriteLine();
-
-                    // --- 4. QUESTION SEPARATOR ---
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine(@"  [ QUESTION ]");
                     Console.WriteLine();
-
-                    // --- 5. WRAPPED QUESTION ---
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     List<string> wrappedQuestion = WordWrap($"Q: {q.Prompt}", 60);
                     foreach (var line in wrappedQuestion)
@@ -1647,16 +1586,13 @@ namespace ConsoleApp2
                         Console.WriteLine("    " + line);
                     }
                     Console.WriteLine();
-
-                    // --- 6. CHOICES ---
                     Console.ForegroundColor = ConsoleColor.White;
                     foreach (var choice in q.Choices)
                     {
                         Console.WriteLine("      " + choice);
+
                     }
                     Console.WriteLine();
-
-                    // --- 7. INPUT PROMPT ---
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(@"  ───────────────────────────────────────────────────────────────");
                     Console.WriteLine("    [ Type 'x' to exit ]");
@@ -1671,8 +1607,6 @@ namespace ConsoleApp2
                         goBackToStory = true;
                         break;
                     }
-
-                    // --- 8. FEEDBACK ---
                     if (input.Length > 0 && input[0] == q.Answer)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -1692,9 +1626,8 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine("\n    Press any key to continue...");
                     Console.ReadKey();
-                }
 
-                // --- 9. EVALUATION & RESULTS SCREEN ---
+                }
                 if (!goBackToStory)
                 {
                     Console.Clear();
@@ -1729,9 +1662,10 @@ namespace ConsoleApp2
                     }
 
                     Console.ResetColor();
-                    calcu(); 
+                    calcu();
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.ReadKey();
+                    gamemenu(wordDictionary);
                     break;
                 }
 
@@ -1882,7 +1816,7 @@ namespace ConsoleApp2
                 }
             }
         }
-        
+
         // point calculation
         static void calcu()
         {
@@ -1938,4 +1872,3 @@ namespace ConsoleApp2
         }
     }
 }
-
