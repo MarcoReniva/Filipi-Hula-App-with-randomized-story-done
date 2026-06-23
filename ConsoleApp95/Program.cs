@@ -19,13 +19,11 @@ namespace ConsoleApp2
         static int points;
         static Random rng = new Random();
         static Dictionary<string, (string type, string definition, string example)> wordDictionary;
-
-
         static void Main(string[] args)
         {
             wordDictionary = DictionaryInput();
             mainmenu();
-            Console.ReadKey();
+
         }
         static void mainmenu()
         {
@@ -71,9 +69,9 @@ namespace ConsoleApp2
                         try2 = true;
                         break;
                     case "3":
-                        Console.WriteLine("Thank you for Playing!");
+                        Console.WriteLine($"{pad}Thank you for Playing!");
                         Thread.Sleep(1000);
-                        Console.WriteLine("Press any key to end the program...");
+                        Console.WriteLine($"{pad}Press any key to end the program...");
                         try2 = true;
                         Console.ReadKey();
                         Environment.Exit(0);
@@ -546,9 +544,8 @@ namespace ConsoleApp2
                 }
             }
 
-            Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
-
+            Console.Clear();
             // --- HEADER ROW (Every internal line is exactly 69 characters long) ---
             Console.WriteLine($"{pad}╔═════════════════════════════════════════════════════════════════════╗");
             Console.WriteLine($"{pad}║              ___________                                            ║");
@@ -1617,7 +1614,7 @@ namespace ConsoleApp2
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
             bool goBackToStory = false;
-
+          
             do
             {
                 goBackToStory = false;
@@ -1625,6 +1622,8 @@ namespace ConsoleApp2
 
                 foreach (var q in questions)
                 {
+                    Console.Clear();
+                    Console.SetCursorPosition(0, 0);
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Cyan;
 
@@ -1662,7 +1661,7 @@ namespace ConsoleApp2
                     List<string> wrappedStory = WordWrap(text, 60);
                     foreach (string line in wrappedStory)
                     {
-                        Console.WriteLine(pad + "  " + line);
+                        Console.WriteLine(pad + "  " + line);  
                     }
                     Console.WriteLine();
 
@@ -1722,41 +1721,49 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine($"\n {pad} Press any key to continue...");
                     Console.ReadKey();
+                    Console.Clear(); 
 
                 }
                 if (!goBackToStory)
                 {
                     Console.Clear();
+                    int uiWidth = 71;
+                    int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
+                    string pad = new string(' ', leftPad);
+                    int topPad = Math.Max(0, (Console.WindowHeight - 12) / 2);
+                    Console.SetCursorPosition(0, topPad);
+
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("\n\n");
-                    Console.WriteLine(@"        ╔════════════════════════════════════════════════╗");
-                    Console.WriteLine(@"        ║           [O V E R A L L  R E S U L T ]        ║");
-                    Console.WriteLine(@"        ╠════════════════════════════════════════════════╣");
+                    Console.WriteLine(pad + @"╔═════════════════════════════════════════════════════════════════════╗");
+                    Console.WriteLine(pad + @"║                                                                     ║");
+                    Console.WriteLine(pad + @"║                  [ O V E R A L L   R E S U L T ]                    ║");
+                    Console.WriteLine(pad + @"║                                                                     ║");
+                    Console.WriteLine(pad + @"╠═════════════════════════════════════════════════════════════════════╣");
+                    Console.WriteLine(pad + @"║                                                                     ║");
                     Console.ForegroundColor = ConsoleColor.White;
-
-                    Console.WriteLine($"        ║ STORY TITLE    : {title.PadRight(31)} ║");
-                    Console.WriteLine($"        ║ SCORE   : {score} / {questions.Count} Correct                 ║");
-                    Console.WriteLine($"        ║ TOTAL POINTS : {points.ToString().PadRight(4)} PTS                       ║");
-
+                    Console.WriteLine(pad + $"║   STORY TITLE  :  {title.PadRight(50)}║");
+                    Console.WriteLine(pad + $"║   SCORE        :  {(score + " / " + questions.Count + " Correct").PadRight(50)}║");
+                    Console.WriteLine(pad + $"║   TOTAL POINTS :  {(points.ToString() + " PTS").PadRight(50)}║");
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine(@"        ╚════════════════════════════════════════════════╝");
+                    Console.WriteLine(pad + @"║                                                                     ║");
+                    Console.WriteLine(pad + @"╚═════════════════════════════════════════════════════════════════════╝");
 
                     if (score == questions.Count)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("\n                  STATUS: EXCELLENT");
+                        Console.WriteLine(pad + @"                    STATUS: EXCELLENT ★");
                     }
                     else if (score > 0)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("\n                  STATUS: GOOD JOB");
+                        Console.WriteLine(pad + @"                    STATUS: GOOD JOB");
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n                  STATUS: FAILED");
+                        Console.WriteLine(pad + @"                    STATUS: FAILED");
                     }
-
+                    Console.ResetColor();
                     Console.ResetColor();
                     calcu();
                     Console.ForegroundColor = ConsoleColor.DarkGray;
