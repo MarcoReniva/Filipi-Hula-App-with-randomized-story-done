@@ -255,7 +255,7 @@ namespace ConsoleApp2
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write("".PadLeft(Math.Max(0, titlePadding)) + errorTitle + "".PadRight(Math.Max(0, totalBoxInnerWidth - titlePadding - errorTitle.Length)));
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("║"); 
+            Console.WriteLine("║");
             int detailPadding = (totalBoxInnerWidth - errorDetail.Length) / 2;
             Console.Write($"{pad}        ║");
             Console.ForegroundColor = ConsoleColor.White;
@@ -425,7 +425,7 @@ namespace ConsoleApp2
                 Console.ReadKey();
                 regis = true; // Breaks the loop
                 Console.Clear();
-                mainmenu(); 
+                mainmenu();
             }
         }
 
@@ -832,6 +832,7 @@ namespace ConsoleApp2
                 Console.WriteLine(@"  ║");
                 Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
                 Console.WriteLine(@"  ║                    [ DIFFICULTY: EASY ]                     ║");
+                Console.WriteLine(@"  ║               Guess the right word by letter                ║");
                 Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
@@ -940,11 +941,18 @@ namespace ConsoleApp2
                 }
 
                 // --- 8. INPUT PROMPT ---
+                Console.ForegroundColor= ConsoleColor.DarkGray;
+                Console.WriteLine("Enter '0' to go back to the gamemenu");
+                Console.ResetColor();
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("    > ENTER A LETTER : ");
                 Console.ResetColor();
                 string input = Console.ReadLine()?.ToLower();
-
+                if(input == "0")
+                {
+                    gamemenu(wordDictionary);
+                    playing = false;
+                }
                 if (input.Length != 1) //it needs to be char
                 {
                     continue;
@@ -989,7 +997,7 @@ namespace ConsoleApp2
                     Console.ReadKey();
                     return points;
                 }
-
+/*
                 if (wrongGuesses >= 6)
                 {
                     Console.WriteLine("\nYou Lose! - 2 Points.");
@@ -999,7 +1007,7 @@ namespace ConsoleApp2
                     Console.WriteLine("Press any key to go back to hangman menu...");
                     Console.ReadKey();
                     return points;
-                }
+                }*/
             }
             return points;
         }
@@ -1045,6 +1053,7 @@ namespace ConsoleApp2
                 Console.WriteLine(@"  ║");
                 Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
                 Console.WriteLine(@"  ║                   [ DIFFICULTY: NORMAL ]                    ║");
+                Console.WriteLine(@"  ║               Guess the right word by letter                ║");
                 Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
@@ -1196,11 +1205,18 @@ namespace ConsoleApp2
                 else
                 {
                     // Standard letter guessing prompt
+                    Console.ForegroundColor= ConsoleColor.DarkGray;
+                    Console.WriteLine("Enter '0' to go back to gamemenu");
+                    Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("    > ENTER A LETTER : ");
                     Console.ResetColor();
                     string input = Console.ReadLine()?.ToLower();
-
+                    if (input == "0")
+                    {
+                        gamemenu(wordDictionary);
+                        playing = false;
+                    }
                     // --- 9. INPUT VALIDATION ---
                     if (string.IsNullOrWhiteSpace(input) || input.Length != 1 || !char.IsLetter(input[0]))
                     {
@@ -1231,6 +1247,7 @@ namespace ConsoleApp2
 
             return points;
         }
+
         static int HangmanHard(string currentUser, int points, Dictionary<string, (string type, string definition, string example)> wordDictionary)
 
         {
@@ -1267,6 +1284,7 @@ namespace ConsoleApp2
                 Console.WriteLine(@"  ║");
                 Console.WriteLine(@"  ╠═════════════════════════════════════════════════════════════╣");
                 Console.WriteLine(@"  ║                   [ DIFFICULTY: Hard ]                      ║");
+                Console.WriteLine(@"  ║               Guess the right word by letter                ║");
                 Console.WriteLine(@"  ╚═════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
@@ -1315,7 +1333,7 @@ namespace ConsoleApp2
                 // --- 6. WIN / LOSS LOGIC (NORMAL REWARDS) ---
                 if (won)
                 {
-                    points += 10; // Normal Mode Reward!
+                    points += 20; // Normal Mode Reward!
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("\n\n");
@@ -1327,7 +1345,7 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\n          MISSION ACCOMPLISHED! THE WORD WAS: {hangmanwordOrig.ToUpper()}");
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("\n                  REWARD: [ + 10 POINTS ]");
+                    Console.WriteLine("\n                  REWARD: [ + 20 POINTS ]");
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
@@ -1336,7 +1354,7 @@ namespace ConsoleApp2
 
                 if (wrongGuesses >= 6)
                 {
-                    points -= 5; // Normal Mode Penalty!
+                    points -= 8; 
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\n\n");
@@ -1365,11 +1383,18 @@ namespace ConsoleApp2
                 else
                 {
                     // Standard letter guessing prompt
+                    Console.ForegroundColor = ConsoleColor.DarkGray;  
+                    Console.WriteLine("Enter '0' to go back to gamemenu");
+                    Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write("    ▶ ENTER A LETTER : ");
                     Console.ResetColor();
                     string input = Console.ReadLine()?.ToLower();
-
+                    if (input == "0")
+                    {
+                        gamemenu(wordDictionary);
+                        playing = false;
+                    }
                     // --- 9. INPUT VALIDATION ---
                     if (string.IsNullOrWhiteSpace(input) || input.Length != 1 || !char.IsLetter(input[0]))
                     {
@@ -1399,9 +1424,6 @@ namespace ConsoleApp2
             }
 
             return points;
-        }
-        static void UI ()
-        {
         }
         static void Readingcomp()
         {
@@ -1633,7 +1655,7 @@ namespace ConsoleApp2
                     int spaces = 61 - 4 - playerText.Length - pointsText.Length;
 
                     if (spaces < 0) spaces = 0;
-                    int uiWidth = 65; 
+                    int uiWidth = 65;
                     int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
                     string pad = new string(' ', leftPad);
 
