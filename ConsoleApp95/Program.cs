@@ -72,7 +72,11 @@ namespace ConsoleApp2
                         break;
                     case "3":
                         Console.WriteLine("Thank you for Playing!");
+                        Thread.Sleep(1000);
+                        Console.WriteLine("Press any key to end the program...");
                         try2 = true;
+                        Console.ReadKey();
+                        Environment.Exit(0);
                         break;
                     default:
                         Console.Clear();
@@ -750,8 +754,6 @@ namespace ConsoleApp2
             for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
             {
                 Console.Clear();
-
-
                 DrawHangman(wrongGuesses);
                 Console.WriteLine();
                 Console.WriteLine("[Loading a new game....]");
@@ -941,14 +943,14 @@ namespace ConsoleApp2
                 }
 
                 // --- 8. INPUT PROMPT ---
-                Console.ForegroundColor= ConsoleColor.DarkGray;
+                Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine("Enter '0' to go back to the gamemenu");
                 Console.ResetColor();
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("    > ENTER A LETTER : ");
                 Console.ResetColor();
                 string input = Console.ReadLine()?.ToLower();
-                if(input == "0")
+                if (input == "0")
                 {
                     gamemenu(wordDictionary);
                     playing = false;
@@ -975,7 +977,6 @@ namespace ConsoleApp2
                     wrongGuesses++;
                 }
 
-
                 // Check win
 
                 foreach (char c in hangmanword)
@@ -986,28 +987,6 @@ namespace ConsoleApp2
                         break;
                     }
                 }
-
-                if (won)
-                {
-                    Console.WriteLine("\nYou Win! + 5 Points!");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points += 5;
-                    playing = false;
-                    Console.WriteLine("Press any key to go back to hangman menu...");
-                    Console.ReadKey();
-                    return points;
-                }
-/*
-                if (wrongGuesses >= 6)
-                {
-                    Console.WriteLine("\nYou Lose! - 2 Points.");
-                    Console.WriteLine("The word was: " + hangmanword);
-                    points -= 2;
-                    playing = false;
-                    Console.WriteLine("Press any key to go back to hangman menu...");
-                    Console.ReadKey();
-                    return points;
-                }*/
             }
             return points;
         }
@@ -1205,7 +1184,7 @@ namespace ConsoleApp2
                 else
                 {
                     // Standard letter guessing prompt
-                    Console.ForegroundColor= ConsoleColor.DarkGray;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine("Enter '0' to go back to gamemenu");
                     Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -1354,7 +1333,7 @@ namespace ConsoleApp2
 
                 if (wrongGuesses >= 6)
                 {
-                    points -= 8; 
+                    points -= 8;
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("\n\n");
@@ -1366,7 +1345,7 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"\n          MISSION FAILED. THE TARGET WORD WAS: {hangmanwordOrig.ToUpper()}");
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("\n                  PENALTY: [ - 5 POINTS ]");
+                    Console.WriteLine("\n                  PENALTY: [ - 8 POINTS ]");
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
@@ -1383,7 +1362,7 @@ namespace ConsoleApp2
                 else
                 {
                     // Standard letter guessing prompt
-                    Console.ForegroundColor = ConsoleColor.DarkGray;  
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine("Enter '0' to go back to gamemenu");
                     Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Green;
