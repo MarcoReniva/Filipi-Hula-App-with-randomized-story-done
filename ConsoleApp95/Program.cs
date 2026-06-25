@@ -314,7 +314,7 @@ namespace ConsoleApp2
                 Console.WriteLine($"{pad}╚═════════════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
-                Console.WriteLine( pad +"type '/' to go back");
+                Console.WriteLine(pad + "type '/' to go back");
                 // --- INPUT FIELDS (Perfectly aligned with the box left margin) ---
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{pad}> USERNAME         : ");
@@ -343,7 +343,7 @@ namespace ConsoleApp2
                 Console.ResetColor();
 
                 Console.WriteLine($"{pad}=======================================================================");
-                
+
                 if (string.IsNullOrWhiteSpace(newuser) || string.IsNullOrWhiteSpace(newpass) || string.IsNullOrWhiteSpace(confpass))
                 {
                     WarningPopup("INVALID DATA", "Username and Passwords cannot be empty!");
@@ -461,7 +461,7 @@ namespace ConsoleApp2
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(playerText);
                 Console.Write(new string(' ', spaces));
-                Console.Write("\t   "+pointsText);
+                Console.Write("\t   " + pointsText);
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(@"     ║");
                 Console.WriteLine(pad + @"╠════════════════════╦════════════════════════════════════════════════════╣");
@@ -643,13 +643,13 @@ namespace ConsoleApp2
 
             bool exithangmanmenu = false;
             //CALLL OUT POINT HERE
-
+            Console.Clear();
             while (!exithangmanmenu)
             {
 
-                for (int wrongGuesses = 1; wrongGuesses <= 6; wrongGuesses++)
+                for (int wrongGuesses = 1; wrongGuesses <= 6;)
                 {
-                    Console.Clear();
+                    
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     int uiWidth = 63; // Total width of the box layout (61 internal + 2 borders)
                     int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
@@ -692,7 +692,6 @@ namespace ConsoleApp2
                     Console.WriteLine($"{pad}║         |  ║                                                ║");
                     Console.WriteLine($"{pad}║ ========╩= ║              »» SELECT DIFFICULTY ««           ║");
                     Console.WriteLine($"{pad}╚════════════╩════════════════════════════════════════════════╝");
-
                     Console.ResetColor(); // Good practice so subsequent inputs look normal
                     Console.WriteLine();
 
@@ -742,9 +741,10 @@ namespace ConsoleApp2
                             return;
 
                         default:
-
-                            WarningPopup("INVALID OPTION", "Please enter 0, 1, 2, or 3.");
-                            break;
+                            Console.Clear();
+                            Console.WriteLine("INVALID OPTION", "Please enter 0, 1, 2, or 3.");
+                            exithangmanmenu = false;
+                            continue;
                     }
                 }
                 gamemenu(wordDictionary);
@@ -1088,6 +1088,7 @@ namespace ConsoleApp2
                 Console.WriteLine("    [ W R O N G   L E T T E R S ]");
                 Console.Write("      ");
                 if (WrongLetters.Count == 0)
+
                 {
                     Console.WriteLine("None");
                 }
@@ -1473,11 +1474,12 @@ namespace ConsoleApp2
                     default:
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
+                        Console.WriteLine(pad + "\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
                         Console.ResetColor();
                         System.Threading.Thread.Sleep(1500);
+                        Console.Clear();
                         try4 = false;
-                        break;
+                        continue;
                 }
             }
         }
@@ -1769,7 +1771,7 @@ namespace ConsoleApp2
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(pad + @"                    STATUS: FAILED");
                     }
-                    Console.WriteLine(pad +"Press any key to back");
+                    Console.WriteLine(pad + "Press any key to back");
                     Console.ResetColor();
                     Console.ResetColor();
                     calcu();
