@@ -314,12 +314,18 @@ namespace ConsoleApp2
                 Console.WriteLine($"{pad}╚═════════════════════════════════════════════════════════════════════╝");
                 Console.WriteLine();
 
+                Console.WriteLine( pad +"type '/' to go back");
                 // --- INPUT FIELDS (Perfectly aligned with the box left margin) ---
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{pad}> USERNAME         : ");
                 Console.ResetColor();
                 string newuser = Console.ReadLine();
-
+                if (newuser == "/")
+                {
+                    Console.Clear();
+                    mainmenu();
+                    Console.Clear();
+                }
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{pad}> PASSWORD         : ");
                 Console.ResetColor();
@@ -337,7 +343,7 @@ namespace ConsoleApp2
                 Console.ResetColor();
 
                 Console.WriteLine($"{pad}=======================================================================");
-
+                
                 if (string.IsNullOrWhiteSpace(newuser) || string.IsNullOrWhiteSpace(newpass) || string.IsNullOrWhiteSpace(confpass))
                 {
                     WarningPopup("INVALID DATA", "Username and Passwords cannot be empty!");
@@ -455,9 +461,9 @@ namespace ConsoleApp2
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.Write(playerText);
                 Console.Write(new string(' ', spaces));
-                Console.Write(pointsText);
+                Console.Write("\t   "+pointsText);
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(@"              ║");
+                Console.WriteLine(@"     ║");
                 Console.WriteLine(pad + @"╠════════════════════╦════════════════════════════════════════════════════╣");
                 Console.WriteLine(pad + @"║   .-----------.    ║                                                    ║");
                 Console.WriteLine(pad + @"║   |   GAME    |    ║                                                    ║");
@@ -601,7 +607,6 @@ namespace ConsoleApp2
                     if (rank > 10) break;// limits the rankings to only 10
                 }
             }
-            // --- Empty Records Check ---
             if (!hasPlayers)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -611,13 +616,9 @@ namespace ConsoleApp2
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("║");
             }
-
-            // --- BOX FOOTER BAR ---
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{pad}╚══════════╧════════════════════════════════╧═════════════════════════╝");
             Console.WriteLine();
-
-            // Cleaned up the bottom return prompt centering completely
             string backMsg = "Tap to go back";
             int backPadding = (uiWidth - backMsg.Length) / 2;
             Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -711,6 +712,7 @@ namespace ConsoleApp2
                             System.Threading.Thread.Sleep(600);
                             exithangmanmenu = true;
                             points = HangmanEasy(currentUser, points, wordDictionary);
+                            calcu();
                             break;
 
                         case "2":
@@ -719,6 +721,7 @@ namespace ConsoleApp2
                             Console.WriteLine("\n    Loading Normal Mode...");
                             System.Threading.Thread.Sleep(600);
                             points = HangmanNormal(currentUser, points, wordDictionary);
+                            calcu();
                             break;
 
                         case "3":
@@ -727,6 +730,7 @@ namespace ConsoleApp2
                             Console.WriteLine("\n    Loading Hard Mode...");
                             System.Threading.Thread.Sleep(800);
                             points = HangmanHard(currentUser, points, wordDictionary);
+                            calcu();
                             break;
 
                         case "4":
@@ -1614,30 +1618,30 @@ namespace ConsoleApp2
         static void DisplayStory(string title, string text, List<(string Prompt, string[] Choices, char Answer)> questions, int pointsIfPass, int pointsifNot)
         {
             bool goBackToStory = false;
-          
             do
             {
+
                 goBackToStory = false;
                 int score = 0;
 
-                foreach (var q in questions)
+                int questionIndex = 0;
+                while (questionIndex < questions.Count)
                 {
+                    var q = questions[questionIndex];
+
+                    int uiWidth = 65;
+                    int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
+                    string pad = new string(' ', leftPad);
                     Console.Clear();
                     Console.SetCursorPosition(0, 0);
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Cyan;
-
-                    // --- 1. HUD & HEADER ---
                     string playerText = $"> USER: {currentUser}";
                     string pointsText = $"> SCORE: {points} PTS";
                     int spaces = 61 - 4 - playerText.Length - pointsText.Length;
-
                     if (spaces < 0) spaces = 0;
-                    int uiWidth = 65;
-                    int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
-                    string pad = new string(' ', leftPad);
 
-                    // ── Header box ──────────────────────────────────────────────────
+                    Console.Clear();
                     Console.WriteLine(pad + @"╔═════════════════════════════════════════════════════════════╗");
                     Console.Write(pad + @"║  ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -1651,21 +1655,17 @@ namespace ConsoleApp2
                     Console.WriteLine(pad + @"╚═════════════════════════════════════════════════════════════╝");
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(pad + $"         [ THE STORY : {title.ToUpper()} ]");
+                    Console.WriteLine(pad + $"       [ THE STORY : {title.ToUpper()} ]");
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(pad + @"─────────────────────────────────────────────────────────────");
                     Console.WriteLine();
 
-                    // ── Story text ──────────────────────────────────────────────────
                     Console.ForegroundColor = ConsoleColor.Gray;
                     List<string> wrappedStory = WordWrap(text, 60);
                     foreach (string line in wrappedStory)
-                    {
-                        Console.WriteLine(pad + "  " + line);  
-                    }
+                        Console.WriteLine(pad + "  " + line);
                     Console.WriteLine();
 
-                    // ── Divider + Question ──────────────────────────────────────────
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(pad + @"─────────────────────────────────────────────────────────────");
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -1674,20 +1674,14 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     List<string> wrappedQuestion = WordWrap($"Q: {q.Prompt}", 60);
                     foreach (var line in wrappedQuestion)
-                    {
                         Console.WriteLine(pad + "  " + line);
-                    }
                     Console.WriteLine();
 
-                    // ── Choices ─────────────────────────────────────────────────────
                     Console.ForegroundColor = ConsoleColor.White;
                     foreach (var choice in q.Choices)
-                    {
                         Console.WriteLine(pad + "    " + choice);
-                    }
                     Console.WriteLine();
 
-                    // ── Footer ──────────────────────────────────────────────────────
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine(pad + @"─────────────────────────────────────────────────────────────");
                     Console.WriteLine(pad + "[ Type '0' to exit ]");
@@ -1702,7 +1696,19 @@ namespace ConsoleApp2
                         gamemenu(wordDictionary);
                         break;
                     }
-                    if (input.Length > 0 && input[0] == q.Answer)
+
+                    // ── Invalid input: do NOT advance, just re-show the same question ──
+                    if (input != "A" && input != "B" && input != "C" && input != "D")
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(pad + "\n\t\t\t input. Please enter A, B, C, or D.");
+                        Console.ResetColor();
+                        Console.WriteLine(pad + "  Press any key to try again...");
+                        Console.ReadKey();
+                        continue; // loops back to the same question
+                    }
+
+                    if (input[0] == q.Answer)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"\n {pad}[✓] CORRECT! The answer is {q.Answer}. (+{pointsIfPass} PTS)");
@@ -1721,8 +1727,9 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine($"\n {pad} Press any key to continue...");
                     Console.ReadKey();
-                    Console.Clear(); 
+                    Console.Clear();
 
+                    questionIndex++; // only advance when a valid answer was given
                 }
                 if (!goBackToStory)
                 {
@@ -1747,7 +1754,6 @@ namespace ConsoleApp2
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine(pad + @"║                                                                     ║");
                     Console.WriteLine(pad + @"╚═════════════════════════════════════════════════════════════════════╝");
-
                     if (score == questions.Count)
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
@@ -1763,6 +1769,7 @@ namespace ConsoleApp2
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(pad + @"                    STATUS: FAILED");
                     }
+                    Console.WriteLine(pad +"Press any key to back");
                     Console.ResetColor();
                     Console.ResetColor();
                     calcu();
@@ -1950,7 +1957,6 @@ namespace ConsoleApp2
                 File.WriteAllLines(file, lines);
             }
         }
-
         //  LEVELS 
         static void easy()
         {
