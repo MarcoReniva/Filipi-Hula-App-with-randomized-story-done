@@ -25,6 +25,7 @@ namespace ConsoleApp2
             mainmenu();
 
         }
+
         static void mainmenu()
         {
             bool try2 = false;
@@ -78,7 +79,7 @@ namespace ConsoleApp2
                         break;
                     default:
                         Console.Clear();
-                        Console.WriteLine("Invalid Option please enter either 1, 2 or 3");
+                        Console.WriteLine($"{pad}Invalid Option please enter either 1, 2 or 3");
                         try2 = false;
                         break;
                 }
@@ -127,8 +128,22 @@ namespace ConsoleApp2
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"{pad}> PASSWORD : ");
             Console.ResetColor();
-            string pass = Console.ReadLine();
-
+            string pass = "";
+            ConsoleKeyInfo key;
+            while ((key = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+            {
+                if (key.Key == ConsoleKey.Backspace && pass.Length > 0)
+                {
+                    pass = pass.Substring(0, pass.Length - 1);
+                    Console.Write("\b \b");
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    pass += key.KeyChar;
+                    Console.Write('*');
+                }
+            }
+            Console.WriteLine();
             if (usern == "" || pass == "")
             {
                 Console.Clear();
@@ -306,7 +321,7 @@ namespace ConsoleApp2
                 Console.WriteLine($"{pad}║         | |    ( )    | |                                           ║");
                 Console.WriteLine($"{pad}║         | |   /| |\\   | |                                           ║");
                 Console.WriteLine($"{pad}║         | |  /_\\_/_\\  | |  ====================================     ║");
-                Console.WriteLine($"{pad}║         | |___________| |        * AWAITING NEW PLAYER  * ║");
+                Console.WriteLine($"{pad}║         | |___________| |        * AWAITING NEW PLAYER  *           ║");
                 Console.WriteLine($"{pad}║         |    _______    |  ====================================     ║");
                 Console.WriteLine($"{pad}║         |   |_______|   |                                           ║");
                 Console.WriteLine($"{pad}║         |_______________|                                           ║");
@@ -329,13 +344,39 @@ namespace ConsoleApp2
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{pad}> PASSWORD         : ");
                 Console.ResetColor();
-                string newpass = Console.ReadLine();
-
+                ConsoleKeyInfo key;
+                string newpass = "";
+                while ((key = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+                {
+                    if (key.Key == ConsoleKey.Backspace && newpass.Length > 0)
+                    {
+                        newpass = newpass.Substring(0, newpass.Length - 1);
+                        Console.Write("\b \b");
+                    }
+                    else if (!char.IsControl(key.KeyChar))
+                    {
+                        newpass += key.KeyChar;
+                        Console.Write('*');
+                    }
+                }
                 Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine();
                 Console.Write($"{pad}> CONFIRM PASSWORD : ");
                 Console.ResetColor();
-                string confpass = Console.ReadLine();
-
+                string confpass = "";
+                while ((key = Console.ReadKey(true)).Key != ConsoleKey.Enter)
+                {
+                    if (key.Key == ConsoleKey.Backspace && newpass.Length > 0)
+                    {
+                        confpass = confpass.Substring(0, confpass.Length - 1);
+                        Console.Write("\b \b");
+                    }
+                    else if (!char.IsControl(key.KeyChar))
+                    {
+                        confpass += key.KeyChar;
+                        Console.Write('*');
+                    }
+                }
                 // --- PAUSE ---
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine($"\n{pad}Loading...");
@@ -449,21 +490,25 @@ namespace ConsoleApp2
                 string pointsText = $"> SCORE: {points} PTS";
                 int spaces = 61 - 4 - playerText.Length - pointsText.Length;
                 if (spaces < 0) spaces = 0;
-                // ── Centering helper ────────────────────────────────────────────
                 int uiWidth = 75;
                 int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
                 string pad = new string(' ', leftPad);
+                // Format the player/points row to fit exactly inside the box
+                // The inner width between ║ and ║ is 73 chars
+                string playerSection = playerText.PadRight(38); // left column
+                string pointsSection = pointsText.PadLeft(20);  // right column
+                string innerRow = $"  {playerSection}{pointsSection}";
 
-                // ── Game Menu ───────────────────────────────────────────────────
+                // Trim or pad innerRow to exactly 73 chars so the closing ║ lines up
+                innerRow = innerRow.PadRight(73).Substring(0, 73);
+
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(pad + @"╔═════════════════════════════════════════════════════════════════════════╗");
-                Console.Write(pad + @"║  ");
+                Console.Write(pad + @"║");
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write(playerText);
-                Console.Write(new string(' ', spaces));
-                Console.Write("\t   " + pointsText);
+                Console.Write(innerRow);
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine(@"     ║");
+                Console.WriteLine(@"║");
                 Console.WriteLine(pad + @"╠════════════════════╦════════════════════════════════════════════════════╣");
                 Console.WriteLine(pad + @"║   .-----------.    ║                                                    ║");
                 Console.WriteLine(pad + @"║   |   GAME    |    ║                                                    ║");
@@ -649,7 +694,7 @@ namespace ConsoleApp2
 
                 for (int wrongGuesses = 1; wrongGuesses <= 6;)
                 {
-                    
+
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     int uiWidth = 63; // Total width of the box layout (61 internal + 2 borders)
                     int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
@@ -911,6 +956,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -932,6 +978,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -1123,6 +1170,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Tap to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -1144,6 +1192,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Tap to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -1330,6 +1379,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -1351,6 +1401,7 @@ namespace ConsoleApp2
                     Console.ResetColor();
                     Console.WriteLine("\n\n          Press ANY KEY to return to the Hangman Menu...");
                     Console.ReadKey();
+                    Console.Clear();
                     return points;
                 }
 
@@ -1761,10 +1812,15 @@ namespace ConsoleApp2
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine(pad + @"                    STATUS: EXCELLENT ★");
                     }
-                    else if (score > 0)
+                    else if (score > 1)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine(pad + @"                    STATUS: GOOD JOB");
+                    }
+                    else if (score == 1)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(pad + @"                    STATUS: NICE TRY");
                     }
                     else
                     {
