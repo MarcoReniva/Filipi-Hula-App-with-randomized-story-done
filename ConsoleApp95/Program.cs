@@ -48,13 +48,13 @@ namespace ConsoleApp2
                 Console.WriteLine(pad + @"║   |            |   ║                                                    ║");
                 Console.WriteLine(pad + @"║   O            |   ║          [ 1 ]  >  START / LOGIN                   ║");
                 Console.WriteLine(pad + @"║  /|\           |   ║          [ 2 ]  >  CREATE ACCOUNT                  ║");
-                Console.WriteLine(pad + @"║  / \           |   ║          [ 3 ]  >  EXIT GAME                       ║");
+                Console.WriteLine(pad + @"║  / \           |   ║          [ 0 ]  >  EXIT GAME                       ║");
                 Console.WriteLine(pad + @"║                |   ║                                                    ║");
                 Console.WriteLine(pad + @"║                |   ║                                                    ║");
                 Console.WriteLine(pad + @"║   =============╝   ║                                                    ║");
                 Console.WriteLine(pad + @"╚════════════════════╩════════════════════════════════════════════════════╝");
                 Console.WriteLine();
-                Console.Write($"{pad}Enter your command (1-3) : ");
+                Console.Write($"{pad}Enter your command (1 - 0) : ");
                 Console.ResetColor();
 
                 string output = Console.ReadLine();
@@ -69,7 +69,7 @@ namespace ConsoleApp2
                         regist();
                         try2 = true;
                         break;
-                    case "3":
+                    case "0":
                         Console.WriteLine($"{pad}Thank you for Playing!");
                         Thread.Sleep(1000);
                         Console.WriteLine($"{pad}Press any key to end the program...");
@@ -79,7 +79,7 @@ namespace ConsoleApp2
                         break;
                     default:
                         Console.Clear();
-                        Console.WriteLine($"{pad}Invalid Option please enter either 1, 2 or 3");
+                        WarningPopup("Invalid Option", "please enter either 1, 2 or 0");
                         try2 = false;
                         break;
                 }
@@ -88,12 +88,10 @@ namespace ConsoleApp2
 
         static void login()
         {
-            // ── Centering helper ────────────────────────────────────────────
             int uiWidth = 69;
             int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
             string pad = new string(' ', leftPad);
 
-            // ── System Authentication ────────────────────────────────────────
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(pad + @"╔═════════════════════════════════════════════════════════════════════════╗");
@@ -118,7 +116,6 @@ namespace ConsoleApp2
             Console.WriteLine(pad + @"║                                                                         ║");
             Console.WriteLine(pad + @"╚═════════════════════════════════════════════════════════════════════════╝");
             Console.WriteLine();
-
             // --- INPUT FIELDS ---
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"{pad} > USERNAME : ");
@@ -126,7 +123,7 @@ namespace ConsoleApp2
             string usern = Console.ReadLine();
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"{pad}> PASSWORD : ");
+            Console.Write($"{pad} > PASSWORD : ");
             Console.ResetColor();
             string pass = "";
             ConsoleKeyInfo key;
@@ -165,7 +162,6 @@ namespace ConsoleApp2
                 WarningPopup("USER NOT RECOGNIZED", "Account not found. Please register first.");
                 return;
             }
-
             // --- 4. PASSWORD VERIFICATION (Fixed logic loop) ---
             bool loginSuccess = false;
             for (int i = 0; i < lines.Length; i++)
@@ -174,16 +170,14 @@ namespace ConsoleApp2
                 if (parts.Length >= 2 && parts[0] == usern && parts[1] == pass)
                 {
                     loginSuccess = true;
-                    break; // Stop looking, we found the right password!
+                    break; 
                 }
             }
-
-            // --- 5. LOGIN RESULT ---
+            // log in result
             if (loginSuccess)
             {
                 Console.Clear();
                 currentUser = usern;
-
                 // to Load users points if they have to the leaderboard 
                 points = 0; // reset first
                 if (File.Exists("Leaderboard.txt"))
@@ -210,16 +204,16 @@ namespace ConsoleApp2
                 // ── Access Granted Screen ────────────────────────────────────────
                 Console.ResetColor();
                 Console.WriteLine();
-                Console.WriteLine(pad2 + @"                        ___");
-                Console.WriteLine(pad2 + @"                       /   \");
-                Console.WriteLine(pad2 + @"                      /    /");
-                Console.WriteLine(pad2 + @"                     /    /_");
-                Console.WriteLine(pad2 + @"             _______/       `""--.   ");
-                Console.WriteLine(pad2 + @"            (_________            )");
-                Console.WriteLine(pad2 + @"            (_________            )");
-                Console.WriteLine(pad2 + @"            (_________            )");
-                Console.WriteLine(pad2 + @"            (_________            )");
-                Console.WriteLine(pad2 + @"            (____________________/)");
+                Console.WriteLine(pad2 + @"                                  ___");
+                Console.WriteLine(pad2 + @"                                 /   \");
+                Console.WriteLine(pad2 + @"                                /    /");
+                Console.WriteLine(pad2 + @"                               /    /_");
+                Console.WriteLine(pad2 + @"                       _______/       `""--.   ");
+                Console.WriteLine(pad2 + @"                     (_________            )");
+                Console.WriteLine(pad2 + @"                    (_________            )");
+                Console.WriteLine(pad2 + @"                   (_________            )");
+                Console.WriteLine(pad2 + @"                  (_________            )");
+                Console.WriteLine(pad2 + @"                  (____________________/)");
                 Console.WriteLine();
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(pad2 + @"╔═════════════════════════════════════════════════════════════════════════╗");
@@ -330,7 +324,6 @@ namespace ConsoleApp2
                 Console.WriteLine();
 
                 Console.WriteLine(pad + "type '/' to go back");
-                // --- INPUT FIELDS (Perfectly aligned with the box left margin) ---
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write($"{pad}> USERNAME         : ");
                 Console.ResetColor();
@@ -409,12 +402,9 @@ namespace ConsoleApp2
                     string[] newaccount = { newuser + "," + confpass };
                     File.AppendAllLines("login.txt", newaccount);
                     Console.Clear();
-
-                    // Define the dimensions of the loading block
-                    int blockWidth = 39;  // Width of the "=======================================" line
-                    int blockHeight = 5;  // 3 lines for the box + 1 empty line + 1 line for the progress bar
-
-                    // Calculate centering coordinates
+                    // Format section
+                    int blockWidth = 39;  
+                    int blockHeight = 5; 
                     int targetRow = Math.Max(0, (Console.WindowHeight - blockHeight) / 2);
                     int totalLeftPad = Math.Max(0, (Console.WindowWidth - blockWidth) / 2);
                     string centerPad = new string(' ', totalLeftPad);
@@ -422,17 +412,12 @@ namespace ConsoleApp2
                     // Set cursor to the start row for vertical centering
                     Console.SetCursorPosition(0, targetRow);
 
-                    // Print Header (Cyan)
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"{centerPad}=======================================");
                     Console.WriteLine($"{centerPad}   [   CREATING NEW ACCOUNT   ]   "); // Adjusted spaces so it is centered within the 39-character border
                     Console.WriteLine($"{centerPad}=======================================");
                     Console.ResetColor();
-
-                    // Add a blank line for spacing
                     Console.WriteLine();
-
-                    // Print Progress Bar
                     Console.Write($"{centerPad}PROCESSING: [");
                     Console.ForegroundColor = ConsoleColor.Green;
                     for (int i = 0; i < 20; i++)
@@ -477,7 +462,6 @@ namespace ConsoleApp2
                 mainmenu();
             }
         }
-
         static void gamemenu(Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
             Console.Clear();
@@ -493,16 +477,12 @@ namespace ConsoleApp2
                 int uiWidth = 75;
                 int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
                 string pad = new string(' ', leftPad);
-                // Format the player/points row to fit exactly inside the box
-                // The inner width between ║ and ║ is 73 chars
-                string playerSection = playerText.PadRight(38); // left column
-                string pointsSection = pointsText.PadLeft(20);  // right column
+                string playerSection = playerText.PadRight(38); 
+                string pointsSection = pointsText.PadLeft(20); 
                 string innerRow = $"  {playerSection}{pointsSection}";
-
                 // Trim or pad innerRow to exactly 73 chars so the closing ║ lines up
                 innerRow = innerRow.PadRight(73).Substring(0, 73);
-
-                Console.ForegroundColor = ConsoleColor.Cyan;
+                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine(pad + @"╔═════════════════════════════════════════════════════════════════════════╗");
                 Console.Write(pad + @"║");
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -516,7 +496,7 @@ namespace ConsoleApp2
                 Console.WriteLine(pad + @"║   |___________|    ║        [ 2 ]  >  READING COMPREHENSION             ║");
                 Console.WriteLine(pad + @"║      _    _        ║        [ 3 ]  >  VIEW LEADERBOARD                  ║");
                 Console.WriteLine(pad + @"║    _| |  | |_      ║        [ 4 ]  >  WORD DICTIONARY                   ║");
-                Console.WriteLine(pad + @"║   |_(A)  (B)_|     ║        [ 5 ]  >  LOGOUT & RETURN                   ║");
+                Console.WriteLine(pad + @"║   |_(A)  (B)_|     ║        [ 0 ]  >  LOGOUT & RETURN                   ║");
                 Console.WriteLine(pad + @"║     |_|  |_|       ║                                                    ║");
                 Console.WriteLine(pad + @"║                    ║      >>  SELECT YOUR NEXT CHALLENGE  <<            ║");
                 Console.WriteLine(pad + @"║                    ║                                                    ║");
@@ -543,7 +523,7 @@ namespace ConsoleApp2
                     case "4":
                         DictionaryView(wordDictionary);
                         break;
-                    case "5":
+                    case "0":
                         currentUser = "";
                         try3 = true;
                         Console.Clear();
@@ -594,7 +574,6 @@ namespace ConsoleApp2
                     }
                 }
             }
-
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Clear();
             // --- HEADER ROW (Every internal line is exactly 69 characters long) ---
@@ -612,9 +591,7 @@ namespace ConsoleApp2
             Console.WriteLine($"{pad}╠═════════════════════════════════════════════════════════════════════╣");
             Console.WriteLine($"{pad}║   RANK   │            USERNAME            │         TOTAL SCORE     ║");
             Console.WriteLine($"{pad}╠══════════╪════════════════════════════════╪═════════════════════════╣");
-
             Console.ResetColor();
-
             // --- PLAYERS (TOP 10 ONLY) ---
             int rank = 1;
             bool hasPlayers = false;
@@ -682,7 +659,6 @@ namespace ConsoleApp2
             Console.WriteLine(" |");
             Console.WriteLine("_|_"); ;
         }
-
         static void HangmanMenu(string currentUser, Dictionary<string, (string type, string definition, string example)> wordDictionary)
         {
 
@@ -733,11 +709,11 @@ namespace ConsoleApp2
                     Console.WriteLine($"{pad}║  O      |  ║             [ 1 ] > EASY (BEGINNER)            ║");
                     Console.WriteLine($"{pad}║ /|\\     |  ║             [ 2 ] > NORMAL (OPERATIVE)         ║"); // Used string interpolation smoothly
                     Console.WriteLine($"{pad}║ / \\     |  ║             [ 3 ] > HARD (NIGHTMARE)           ║");
-                    Console.WriteLine($"{pad}║         |  ║             [ 4 ] > RETURN                     ║");
+                    Console.WriteLine($"{pad}║         |  ║             [ 0 ] > RETURN                     ║");
                     Console.WriteLine($"{pad}║         |  ║                                                ║");
                     Console.WriteLine($"{pad}║ ========╩= ║              »» SELECT DIFFICULTY ««           ║");
                     Console.WriteLine($"{pad}╚════════════╩════════════════════════════════════════════════╝");
-                    Console.ResetColor(); // Good practice so subsequent inputs look normal
+                    Console.ResetColor(); 
                     Console.WriteLine();
 
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -777,7 +753,7 @@ namespace ConsoleApp2
                             calcu();
                             break;
 
-                        case "4":
+                        case "0":
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Magenta;
                             Console.WriteLine("\n    Returning...");
@@ -959,7 +935,6 @@ namespace ConsoleApp2
                     Console.Clear();
                     return points;
                 }
-
                 if (wrongGuesses >= 6)
                 {
                     points -= 2;
@@ -1454,7 +1429,6 @@ namespace ConsoleApp2
                     }
                 }
             }
-
             return points;
         }
         static void Readingcomp()
@@ -1478,7 +1452,7 @@ namespace ConsoleApp2
                 Console.WriteLine(pad + @"║   |___________|    ║      [ 1 ]  .  EASY LEVEL                          ║");
                 Console.WriteLine(pad + @"║    ____|||||___    ║      [ 2 ]  .  MEDIUM LEVEL                        ║");
                 Console.WriteLine(pad + @"║   |___________|    ║      [ 3 ]  .  HARD LEVEL                          ║");
-                Console.WriteLine(pad + @"║                    ║      [ 4 ]  .  EXIT                                ║");
+                Console.WriteLine(pad + @"║                    ║      [ 0 ]  .  EXIT                                ║");
                 Console.WriteLine(pad + @"║                    ║                                                    ║");
                 Console.WriteLine(pad + @"║   =============    ║                                                    ║");
                 Console.WriteLine(pad + @"╚════════════════════╩════════════════════════════════════════════════════╝");
@@ -1495,7 +1469,8 @@ namespace ConsoleApp2
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\n    Loading Easy Level...");
-                        System.Threading.Thread.Sleep(600);
+                        Console.WriteLine("\n Read the story carefully and answer the following 5 questions ");
+                        System.Threading.Thread.Sleep(2500);
                         easy();
                         try4 = true;
                         break;
@@ -1503,7 +1478,8 @@ namespace ConsoleApp2
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\n    Loading Medium Level...");
-                        System.Threading.Thread.Sleep(600);
+                        Console.WriteLine("\n Read the story carefully and answer the following 5 questions ");
+                        System.Threading.Thread.Sleep(2500);
                         medium();
                         try4 = true;
                         break;
@@ -1511,11 +1487,12 @@ namespace ConsoleApp2
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\n    Loading Medium Level...");
-                        System.Threading.Thread.Sleep(600);
+                        Console.WriteLine("\n Read the story carefully and answer the following 5 questions ");
+                        System.Threading.Thread.Sleep(2500);
                         hard();
                         try4 = true;
                         break;
-                    case "4":
+                    case "0":
                         Console.ForegroundColor = ConsoleColor.DarkGray;
                         Console.WriteLine("\n    Exiting Reading Comprehension...");
                         System.Threading.Thread.Sleep(500);
@@ -1525,7 +1502,7 @@ namespace ConsoleApp2
                     default:
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(pad + "\n    [!] Invalid Option pls enter either 1, 2, 3 or 4");
+                        Console.WriteLine(pad + "\n    [!] Invalid Option pls enter either 1, 2, 3 or 0");
                         Console.ResetColor();
                         System.Threading.Thread.Sleep(1500);
                         Console.Clear();
@@ -1686,8 +1663,7 @@ namespace ConsoleApp2
                     int leftPad = Math.Max(0, (Console.WindowWidth - uiWidth) / 2);
                     string pad = new string(' ', leftPad);
                     Console.Clear();
-                    Console.SetCursorPosition(0, 0);
-                    Console.Clear();
+                    Console.CursorVisible = false;
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     string playerText = $"> USER: {currentUser}";
                     string pointsText = $"> SCORE: {points} PTS";
@@ -1708,9 +1684,9 @@ namespace ConsoleApp2
                     Console.WriteLine(pad + @"╚═════════════════════════════════════════════════════════════╝");
                     Console.WriteLine();
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(pad + $"       [ THE STORY : {title.ToUpper()} ]");
+                    Console.WriteLine(pad + $"[ THE STORY : {title.ToUpper()} ]");
                     Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine(pad + @"─────────────────────────────────────────────────────────────");
+                    Console.WriteLine(pad + @"────────────────────────────────────────────────────────────────");
                     Console.WriteLine();
 
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -1779,7 +1755,7 @@ namespace ConsoleApp2
 
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.WriteLine($"\n {pad} Press any key to continue...");
-                    Console.ReadKey();
+                    Console.ReadKey(true);
                     Console.Clear();
 
                     questionIndex++; // only advance when a valid answer was given
@@ -1935,7 +1911,7 @@ namespace ConsoleApp2
                 Console.WriteLine($"  [ PAGE {currentPage} OF {totalPages} ]");
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("    [N] Next Page  |  [P] Prev Page  |  [Q] Quit / Return");
+                Console.WriteLine("    [N] Next Page  |  [P] Prev Page  |  [0] Quit / Return");
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.Write("\n    > COMMAND : ");
@@ -1967,7 +1943,7 @@ namespace ConsoleApp2
                             System.Threading.Thread.Sleep(800);
                         }
                         break;
-                    case "Q":
+                    case "0":
                     case "QUIT":
                     case "BACK":
                     case "EXIT":
@@ -1978,7 +1954,7 @@ namespace ConsoleApp2
                         break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("    [!] Invalid command. Use N, P, or Q.");
+                        Console.WriteLine("    [!] Invalid command. Use N, P, or 0.");
                         System.Threading.Thread.Sleep(800);
                         break;
                 }
